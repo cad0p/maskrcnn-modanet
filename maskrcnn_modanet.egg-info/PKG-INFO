@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: maskrcnn-modanet
+Version: 0.1
+Summary: A MaskRCNN Keras implementation with Modanet annotations on the Paperdoll dataset
+Home-page: https://github.com/cad0p/maskrcnn-modanet
+Author: Pier Carlo Cadoppi
+Author-email: piercarlo.cadoppi@studenti.unipr.it
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
