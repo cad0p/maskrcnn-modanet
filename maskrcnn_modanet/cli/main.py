@@ -38,17 +38,19 @@ def download(path):
 
 	os.system("sh " + dir_pkg_path + "download.sh '" + path + "'")
 	
-
+	
 	savedvars = {
 		'datapath': path
 	}
 
-	with open(dir_pkg_path + 'savedvars.json', 'w') as outfile:
+	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json', 'w') as outfile:
 		json.dump(savedvars, outfile)
 
 
 @datasets.command()
-def prepare():
-	''' Prepares the dataset for training!
+def arrange():
+	''' Arranges the dataset for training!
 
 	'''
+	from .. import arrange_images
+	from .. import arrange_annotations
