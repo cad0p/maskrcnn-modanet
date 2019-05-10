@@ -9,7 +9,7 @@ import copy
 
 import random
 
-random.seed(30)
+
 
 ann_path = path + "datasets/coco/annotations/"
 ann_orig_path = path + 'datasets/modanet/annotations/'
@@ -23,11 +23,28 @@ if not os.path.isfile(ann_path + 'instances_all.json'):
 	with open(ann_path + 'instances_all.json', 'w') as outfile:
 		json.dump(instances, outfile)
 
-# 				  train val test
-sets_percentages = [80, 20, 10]
+print('Now arranging annotations')
+print()
+
+# now asking variables, if not already saved
+if savedvars['percentagetrain'] == None:
+	savedvars['seed'] = input('Random images selection seed (insert a number of your choice): ')
+	savedvars['percentagetrain'] = input('Train Annotations Set Percentage: ')
+	savedvars['percentageval'] = input('Val Annotations Set Percentage: ')
+	savedvars['percentagetest'] = input('Test Annotations Set Percentage: ')
+
+	# now saving them
+	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json', 'w') as outfile:
+		json.dump(savedvars, outfile)
+
+
+sets_percentages = [int(savedvars['percentagetrain']), int(savedvars['percentageval']), int(savedvars['percentagetest'])]
+random.seed(int(savedvars['seed']))
 
 
 print("Doing " + str([str(p) + '% ' + n for p, n in zip(sets_percentages, sets_names)]))
+print('You can always change them later by typing: maskrcnn-modanet savedvars edit [variable name] [variable value]')
+print('You can check the names of the variables by typing: maskrcnn-modanet savedvars show')
 
 
 with open(ann_path + 'instances_all.json') as f:
@@ -49,7 +66,7 @@ val_ann = copy.deepcopy(train_ann)
 test_ann = copy.deepcopy(train_ann)
 
 if sum(sets_percentages) != 100:
-	print("Values not valid, doing 80% train, 10 val and 10 test!")
+	print("Values not valid, doing 80% train, 10 val and 10 test! Please update your sets percentages")
 	sets_percentages = [80, 10, 10]
 
 split_percs = [0]

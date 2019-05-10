@@ -22,7 +22,8 @@ setuptools.setup(
     ],
     install_requires=[
       'keras-maskrcnn',
-      'click'
+      'click',
+      'progressbar'
     ],
     entry_points = {
         'console_scripts': [

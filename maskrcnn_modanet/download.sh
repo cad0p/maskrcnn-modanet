@@ -50,3 +50,15 @@ mkdir coco #this will be our dataset final folder
 cd coco
 mkdir images
 mkdir annotations
+
+cd ..
+cd .. #now in main folder
+mkdir results
+cd results
+pwd
+mkdir snapshots
+mkdir logs
+
+tree -d $PATH1 -I lib --matchdirs
+
+

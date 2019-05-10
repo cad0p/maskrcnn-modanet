@@ -90,12 +90,14 @@ class PhotoData(object):
 
 photo_data = PhotoData(img_orig_path + 'photos.lmdb')
 print("Total # of photos (also the ones without annotations) is " + str(len(photo_data)))
-
-for i in range(len(photosIDs)):
+print()
+print('Copying photos to the new folder (just for the first run)')
+from progressbar import ProgressBar
+pbar = ProgressBar()
+for i in pbar(range(len(photosIDs))):
     photo = photos.iloc[i]
-    #print(photo.id)
-    #print(photo.url)
-    #photo_data[photo.id].show()
-    #import ipdb; ipdb.set_trace()
     if not os.path.isfile(img_path + photosFILE_NAMEs[photo.id]):
     	photo_data[photo.id].save(img_path + photosFILE_NAMEs[photo.id])
+
+print()
+print()
