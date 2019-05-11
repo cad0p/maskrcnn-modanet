@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 run with
-python3 ./train.py coco ../datasets/coco/
+maskrcnn-modanet train --epochs 15 --workers 0 --batch-size 1 coco
 """
 
 import argparse
@@ -149,7 +149,7 @@ def create_generators(args):
 
     if args.dataset_type == 'coco':
         # import here to prevent unnecessary dependency on cocoapi
-        from coco import CocoGenerator
+        from maskrcnn_modanet.train.coco import CocoGenerator
 
         train_generator = CocoGenerator(
             args.coco_path,
@@ -205,7 +205,7 @@ def check_args(parsed_args):
 
 
 def parse_args(args, savedvars):
-    parser     = argparse.ArgumentParser(description='Simple training script for training a RetinaNet mask network.')
+    parser     = argparse.ArgumentParser(prog='maskrcnn-modanet train', description='Simple training script for training a RetinaNet mask network.')
     subparsers = parser.add_subparsers(help='Arguments for specific dataset types.', dest='dataset_type')
     subparsers.required = True
 
@@ -250,10 +250,10 @@ def main(args=None):
     with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
         savedvars = json.load(f)
 
-
     # parse arguments
     if args is None:
-        args = sys.argv[1:]
+        print('\n\n\nExample usage: maskrcnn-modanet train --epochs 15 --workers 0 --batch-size 1 coco\n\n\n')
+        args = ['-h']
     args = parse_args(args, savedvars)
 
     # make sure keras is the minimum required version

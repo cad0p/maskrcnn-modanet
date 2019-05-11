@@ -14,28 +14,28 @@ def datasets():
 	''' Manage your datasets '''
 	pass
 
-@main.command()
-@click.argument('pythoncommand', type=str)
-@click.argument('args', type=str, required=False, nargs=-1)
-def train(pythoncommand, args=''):
+
+@main.command(name='train', context_settings=dict(
+    ignore_unknown_options=True,
+))
+@click.argument('args', required=False, nargs=-1)
+def train(args):
 	''' Train using the dataset downloaded
 		usage: 
 		\n\nmaskrcnn-modanet train [your command to launch a python 3 script] [arguments for the script]
 		\n\nthe command to launch a python 3 script could either be python or python3, depending on your machine
 		\n\nAn example could be:
-		\n\nmaskrcnn-modanet train python3 coco --epochs 15 --workers 0 --batch-size 0
+		\n\nmaskrcnn-modanet train --epochs 15 --workers 0 --batch-size 0 coco
 	'''
-	import copy
 
-	if args != '':
-		args_orig = copy.deepcopy(args)
-		args = ''
-		for arg in args_orig:
-			args += arg + ' '
+	if args == ():
+		args = None
 
 	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
 		savedvars = json.load(f)
-	os.system(str(pythoncommand) + ' ' + savedvars['pkgpath'] + "train/train.py " + str(args))
+	# os.system(str(pythoncommand) + ' ' + savedvars['pkgpath'] + "train/train.py " + args)
+	from maskrcnn_modanet.train.train import main
+	main(args)
 
 @main.group()
 def savedvars():
