@@ -15,27 +15,19 @@ def datasets():
 	pass
 
 @main.command()
-@click.argument('pythoncommand', type=str)
-@click.argument('args', type=str, required=False, nargs=-1)
 def train(pythoncommand, args=''):
 	''' Train using the dataset downloaded
 		usage: 
-		\n\nmaskrcnn-modanet train [your command to launch a python 3 script] [arguments for the script]
-		\n\nthe command to launch a python 3 script could either be python or python3, depending on your machine
-		\n\nAn example could be:
-		\n\nmaskrcnn-modanet train python3 coco --epochs 15 --workers 0 --batch-size 0
+		\n\nmaskrcnn-modanet train
 	'''
-	import copy
-
-	if args != '':
-		args_orig = copy.deepcopy(args)
-		args = ''
-		for arg in args_orig:
-			args += arg + ' '
 
 	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
 		savedvars = json.load(f)
-	os.system(str(pythoncommand) + ' ' + savedvars['pkgpath'] + "train/train.py " + str(args))
+
+	if savedvars['train'] == None:
+		savedvars['train']
+
+	# os.system(str(pythoncommand) + ' ' + savedvars['pkgpath'] + "train/train.py " + str(args))
 
 @main.group()
 def savedvars():
@@ -74,7 +66,21 @@ def download(path):
 		'seed' : None,
 		'percentagetrain' : None,
 		'percentageval' : None,
-		'percentagetest' : None
+		'percentagetest' : None,
+		'train': {
+			'dataset_types' : ['coco', 'csv'],
+			'coco' : ['coco_path'],
+			'csv' : ['annotations', 'classes', 'val_annotations'],
+			'dataset_type' : 'coco',
+			'coco_path' : path + 'datasets/coco/',
+			'annotations' : None,
+			'classes' : None,
+			'val_annotations' : None,
+			'mutually_exclusive_group' : ['snapshot', 'imagenet_weights', 'weights', 'no_weights'],
+			
+
+		}
+
 	}
 
 	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json', 'w') as outfile:
