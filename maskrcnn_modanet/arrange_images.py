@@ -11,7 +11,6 @@ import lmdb
 import sqlite3
 import pandas as pd
 from PIL import Image
-from IPython.display import display
 import sqlalchemy
 
 # name of the set we are getting the annotations from. in the case of modanet, the set containing all info is the train one.
