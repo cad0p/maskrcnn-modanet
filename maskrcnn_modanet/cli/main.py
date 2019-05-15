@@ -42,6 +42,11 @@ def savedvars():
 	''' Show and edit saved variables '''
 	pass
 
+@main.command()
+def show(img_path):
+	''' Ingresso path immagine da analizzare che ritorna la lista delle segmentazioni e bounding box '''
+	pass
+
 @datasets.command()
 @click.argument('path', callback=validators.check_if_folder_exists)
 def download(path):
