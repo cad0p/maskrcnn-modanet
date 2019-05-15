@@ -25,11 +25,24 @@ if [ ! -d "./photos.lmdb" ]
 then
 	wget http://vision.is.tohoku.ac.jp/chictopia2/photos.lmdb.tar
 	tar xf photos.lmdb.tar
-	rm photos.lmdb.tar
+	if [ -d "./photos.lmdb" ]
+	then
+		rm photos.lmdb.tar
+	else
+		echo "install tar and run again this command!"
+		exit 1
+	fi
 else echo "photos database already downloaded!"
 fi
+
 gunzip -c chictopia.sql.gz | sqlite3 chictopia.sqlite3
-rm chictopia.sql.gz
+if [ -f "./chictopia.sqlite3" ]
+then
+	rm chictopia.sql.gz
+else
+	echo "install gunzip and sqlite3 and run again this command!"
+	exit 1
+fi
 
 cd ..
 cd ..

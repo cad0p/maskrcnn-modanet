@@ -66,7 +66,7 @@ def download(path):
 	os.system("sh " + dir_pkg_path + "download.sh '" + path + "'")
 	
 	print("If you don't have tree installed, just install it for bash terminal and run this command again: \nmaskrcnn-modanet datasets download")	
-
+	print("\nThis command also stores your saved variables with the default values. run 'maskrcnn-modanet savedvars show' to see them")
 	savedvars = {
 		'savedvarspath': os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json',
 		'datapath': path,
