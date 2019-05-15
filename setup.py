@@ -23,7 +23,9 @@ setuptools.setup(
     install_requires=[
       'keras-maskrcnn',
       'click',
-      'progressbar'
+      'lmdb',
+      'pandas',
+      'sqlalchemy'
     ],
     entry_points = {
         'console_scripts': [
