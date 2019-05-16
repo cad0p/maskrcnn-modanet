@@ -123,7 +123,7 @@ for img in instances['images']:
 
 for cat_id in range(1, len(cat_anns)):
 	print("Category ID: " + str(cat_id) + "\tCat Anns: " + str(sum(cat_anns[cat_id])) + 
-		"\tCat Percs:" + str([i / sum(cat_anns[cat_id]) * 100 for i in cat_anns[cat_id]]))
+		"\tCat Percs:" + str([i / float(sum(cat_anns[cat_id])) * 100 for i in cat_anns[cat_id]]))
 
 
 
