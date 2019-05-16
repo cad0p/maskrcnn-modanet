@@ -11,7 +11,13 @@ def main():
 
 @main.group()
 def datasets():
-	''' Manage your datasets '''
+	''' Manage your datasets
+
+
+	run 
+	  \n\n1 -> maskrcnn-modanet datasets download [your path here]
+	  	\n2 -> maskrcnn-modanet datasets arrange
+	 '''
 	pass
 
 
@@ -43,6 +49,7 @@ def savedvars():
 	pass
 
 @main.command()
+@click.argument('img_path', callback=validators.check_if_file_exists)
 def show(img_path):
 	''' Ingresso path immagine da analizzare che ritorna la lista delle segmentazioni e bounding box '''
 	pass

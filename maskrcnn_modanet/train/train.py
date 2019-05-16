@@ -318,7 +318,6 @@ def main(args=None):
     else:
         use_multiprocessing = False
 
-    #import ipdb; ipdb.set_trace()
 
     # start training
     training_model.fit_generator(
