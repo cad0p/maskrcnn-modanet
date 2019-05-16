@@ -26,7 +26,8 @@ setuptools.setup(
       'progressbar',
       'lmdb',
       'pandas',
-      'sqlalchemy'
+      'sqlalchemy',
+      'pycocotools'
     ],
     entry_points = {
         'console_scripts': [
