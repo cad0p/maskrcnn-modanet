@@ -72,6 +72,7 @@ pwd
 mkdir snapshots
 mkdir logs
 
+# does not show folders named lib (which clutter the graph)
 tree -d $PATH1 -I lib --matchdirs
 
 

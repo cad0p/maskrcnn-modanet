@@ -111,8 +111,14 @@ def show():
 @click.argument('variable')
 @click.argument('newvalue', default=None, required=False)
 def edit(variable, newvalue):
+	exceptions = ['pkgpath', 'savedvarspath']
+
 	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
 		savedvars = json.load(f)
-	savedvars[variable] = newvalue
+	if variable not in exceptions:
+		savedvars[variable] = newvalue
+	else:
+		print("The variable " + variable + " is view only. Value not modified")
+
 	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json', 'w') as outfile:
 		json.dump(savedvars, outfile)
