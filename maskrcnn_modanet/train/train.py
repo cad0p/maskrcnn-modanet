@@ -156,14 +156,18 @@ def create_generators(args):
             'train',
             transform_generator=transform_generator,
             batch_size=args.batch_size,
-            config=args.config
+            config=args.config,
+            image_min_side=800,
+            image_max_side=1333
         )
 
         validation_generator = CocoGenerator(
             args.coco_path,
             'val',
             batch_size=args.batch_size,
-            config=args.config
+            config=args.config,
+            image_min_side=800,
+            image_max_side=1333
         )
     elif args.dataset_type == 'csv':
         from keras_maskrcnn.preprocessing.csv_generator import CSVGenerator
@@ -173,7 +177,9 @@ def create_generators(args):
             args.classes,
             transform_generator=transform_generator,
             batch_size=args.batch_size,
-            config=args.config
+            config=args.config,
+            image_min_side=800,
+            image_max_side=1333
         )
 
         if args.val_annotations:
@@ -181,7 +187,9 @@ def create_generators(args):
                 args.val_annotations,
                 args.classes,
                 batch_size=args.batch_size,
-                config=args.config
+                config=args.config,
+                image_min_side=800,
+                image_max_side=1333
             )
         else:
             validation_generator = None
