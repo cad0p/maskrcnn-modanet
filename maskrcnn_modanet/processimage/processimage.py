@@ -9,24 +9,6 @@ img_path = path + "datasets/coco/images/"
 ann_path = path + "datasets/coco/annotations/"
 snp_path = path + "results/snapshots"
 
-# import keras
-import keras
-
-# import keras_retinanet
-from keras_maskrcnn import models
-from keras_maskrcnn.utils.visualization import draw_mask
-from keras_retinanet.utils.visualization import draw_box, draw_caption, draw_annotations
-from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
-from keras_retinanet.utils.colors import label_color
-
-# import miscellaneous modules
-import matplotlib.pyplot as plt
-import cv2
-import numpy as np
-import time
-
-# set tf backend to allow memory to grow, instead of claiming everything
-import tensorflow as tf
 
 def get_session():
     config = tf.ConfigProto()
@@ -34,6 +16,24 @@ def get_session():
     return tf.Session(config=config)
 
 def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
+	# import keras
+	import keras
+
+	# import keras_retinanet
+	from keras_maskrcnn import models
+	from keras_maskrcnn.utils.visualization import draw_mask
+	from keras_retinanet.utils.visualization import draw_box, draw_caption, draw_annotations
+	from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
+	from keras_retinanet.utils.colors import label_color
+
+	# import miscellaneous modules
+	import matplotlib.pyplot as plt
+	import cv2
+	import numpy as np
+	import time
+
+	# set tf backend to allow memory to grow, instead of claiming everything
+	import tensorflow as tf
 
 	# use this environment flag to change which GPU to use
 	#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
