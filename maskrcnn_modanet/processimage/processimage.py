@@ -1,6 +1,14 @@
 import json
 import os
 
+with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
+	savedvars = json.load(f)
+path = savedvars['datapath']
+
+img_path = path + "datasets/coco/images/"
+ann_path = path + "datasets/coco/annotations/"
+snp_path = path + "results/snapshots"
+
 # import keras
 import keras
 
@@ -25,14 +33,7 @@ def get_session():
     config.gpu_options.allow_growth = True
     return tf.Session(config=config)
 
-def main(proc_img_path, all_set, save_path=None, model_path):
-	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
-		savedvars = json.load(f)
-	path = savedvars['datapath']
-
-	img_path = path + "datasets/coco/images/"
-	ann_path = path + "datasets/coco/annotations/"
-	snp_path = path + "results/snapshots"
+def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
 
 	# use this environment flag to change which GPU to use
 	#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
