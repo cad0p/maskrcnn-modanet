@@ -1,6 +1,7 @@
 import click, json, os
 
 from . import validators
+from maskrcnn_modanet.processimage import processimage, processimagesegments
 
 
 @click.group()
@@ -48,11 +49,11 @@ def savedvars():
 	''' Show and edit saved variables '''
 	pass
 
-@main.command()
-@click.argument('img_path', callback=validators.check_if_file_exists)
-def show(img_path):
-	''' Ingresso path immagine da analizzare che ritorna la lista delle segmentazioni e bounding box '''
+@main.group()
+def processimage():
+	''' View and save processed image and annotations from input image '''
 	pass
+
 
 @datasets.command()
 @click.argument('path', callback=validators.check_if_folder_exists)
@@ -122,3 +123,49 @@ def edit(variable, newvalue):
 
 	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json', 'w') as outfile:
 		json.dump(savedvars, outfile)
+
+
+
+@processimage.group()
+def view():
+	''' View result. image or annotations '''
+	pass
+
+@processimage.group()
+def save():
+	''' Save result. image or annotations '''
+	pass
+
+@view.command()
+@click.argument('proc_img_path', callback=validators.check_if_file_exists)
+@click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
+@click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
+@click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
+def image(proc_img_path, segments, all_set, model_path):
+	''' Show processed image '''
+	if not segments:
+		processimage.main(proc_img_path, all)
+
+@view.command()
+@click.argument('proc_img_path', callback=validators.check_if_file_exists)
+def annotations(proc_img_path):
+	''' Show processed image annotations '''
+	pass
+
+@save.command()
+@click.argument('proc_img_path', callback=validators.check_if_file_exists)
+@click.argument('save_path')
+@click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
+@click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
+@click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
+def image(proc_img_path, segments, all_set, model_path):
+	''' Save processed image '''
+	pass
+
+@save.command()
+@click.argument('proc_img_path', callback=validators.check_if_file_exists)
+@click.argument('save_path')
+def annotations(proc_img_path):
+	''' Save processed image annotations '''
+	pass
+

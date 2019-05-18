@@ -27,6 +27,8 @@ setuptools.setup(
       'lmdb',
       'pandas',
       'sqlalchemy',
+      'Cython',
+      'numpy',
       'pycocotools'
     ],
     entry_points = {

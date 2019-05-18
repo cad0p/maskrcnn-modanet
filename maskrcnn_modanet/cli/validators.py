@@ -12,6 +12,7 @@ def check_if_folder_exists(ctx, param, value):
 	
 	return value + '/'
 
+
 def check_if_file_exists(ctx, param, value):
 	""" check_if_file_exists and if not, ask again """
 	# making path absolute
