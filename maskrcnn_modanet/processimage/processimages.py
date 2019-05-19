@@ -73,50 +73,54 @@ def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
 		# just draw the image selected
 		images = [read_image_bgr(proc_img_path)]
 
-	#for each image in the dataset
-	for img in instances['images']:
+
+	try:
+		#for each image in the dataset
+		for img in instances['images']:
 
 
-		image = read_image_bgr(img_path + img['file_name'])
+			image = read_image_bgr(img_path + img['file_name'])
 
-		# copy to draw on
-		draw = image.copy()
-		draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
+			# copy to draw on
+			draw = image.copy()
+			draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
 
-		# preprocess image for network
-		image = preprocess_image(image)
-		image, scale = resize_image(image)
+			# preprocess image for network
+			image = preprocess_image(image)
+			image, scale = resize_image(image)
 
-		# process image
-		start = time.time()
-		outputs = model.predict_on_batch(np.expand_dims(image, axis=0))
-		print("processing time: ", time.time() - start)
+			# process image
+			start = time.time()
+			outputs = model.predict_on_batch(np.expand_dims(image, axis=0))
+			print("processing time: ", time.time() - start, "\t(Ctrl+c and close image to exit)")
 
-		boxes  = outputs[-4][0]
-		scores = outputs[-3][0]
-		labels = outputs[-2][0]
-		masks  = outputs[-1][0]
+			boxes  = outputs[-4][0]
+			scores = outputs[-3][0]
+			labels = outputs[-2][0]
+			masks  = outputs[-1][0]
 
-		# correct for image scale
-		boxes /= scale
+			# correct for image scale
+			boxes /= scale
 
-		# visualize detections
-		for box, score, label, mask in zip(boxes, scores, labels, masks):
-		    if score < 0.5:
-		        break
+			# visualize detections
+			for box, score, label, mask in zip(boxes, scores, labels, masks):
+			    if score < 0.5:
+			        break
 
-		    color = label_color(label)
-		    
-		    b = box.astype(int)
-		    draw_box(draw, b, color=color)
-		    
-		    mask = mask[:, :, label]
-		    draw_mask(draw, b, mask, color=label_color(label))
-		    
-		    caption = "{} {:.3f}".format(labels_to_names[label], score)
-		    draw_caption(draw, b, caption)
-		    
-		plt.figure(figsize=(15, 15))
-		plt.axis('off')
-		plt.imshow(draw)
-		plt.show()
+			    color = label_color(label)
+			    
+			    b = box.astype(int)
+			    draw_box(draw, b, color=color)
+			    
+			    mask = mask[:, :, label]
+			    draw_mask(draw, b, mask, color=label_color(label))
+			    
+			    caption = "{} {:.3f}".format(labels_to_names[label], score)
+			    draw_caption(draw, b, caption)
+			    
+			plt.figure(figsize=(15, 15))
+			plt.axis('off')
+			plt.imshow(draw)
+			plt.show()
+	except KeyboardInterrupt:
+		pass
