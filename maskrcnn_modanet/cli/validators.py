@@ -16,7 +16,8 @@ def check_if_folder_exists(ctx, param, value):
 def check_if_file_exists(ctx, param, value):
 	""" check_if_file_exists and if not, ask again """
 	# making path absolute
-	value = os.path.realpath(value)
+	if value == None: return value
+	value = os.path.abspath(value)
 	while not os.path.isfile(value):
-		value = os.path.realpath(input("This file doesn't exist. Insert it again here: "))
+		value = os.path.abspath(input("This file doesn't exist. Insert it again here: "))
 	return value

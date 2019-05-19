@@ -1,7 +1,7 @@
 import click, json, os
 
 from . import validators
-from maskrcnn_modanet.processimage import processimage, processimagesegments
+from maskrcnn_modanet.processimage import processimages, processimagesegments
 
 
 @click.group()
@@ -144,7 +144,7 @@ def save():
 def image(proc_img_path, segments, all_set, model_path):
 	''' Show processed image '''
 	if not segments:
-		processimage.main(proc_img_path, all)
+		processimages.main(proc_img_path, all_set)
 
 @view.command()
 @click.argument('proc_img_path', callback=validators.check_if_file_exists)

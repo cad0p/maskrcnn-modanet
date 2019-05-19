@@ -11,9 +11,11 @@ snp_path = path + "results/snapshots"
 
 
 def get_session():
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    return tf.Session(config=config)
+	import tensorflow as tf
+
+	config = tf.ConfigProto()
+	config.gpu_options.allow_growth = True
+	return tf.Session(config=config)
 
 def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
 	# import keras
