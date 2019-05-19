@@ -4,6 +4,12 @@ from . import validators
 from maskrcnn_modanet.processimage import processimages, processimagesegments
 
 
+def print_help(ctx, param, value):
+    if value is False:
+        return
+    click.echo(ctx.get_help())
+    ctx.exit()
+
 @click.group()
 def main():
 	"""Main CLI."""
@@ -137,14 +143,20 @@ def save():
 	pass
 
 @view.command()
-@click.argument('proc_img_path', callback=validators.check_if_file_exists)
+@click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
+@click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
-def image(proc_img_path, segments, all_set, model_path):
+@click.option('--help', is_flag=True, expose_value=False, is_eager=False, callback=print_help, help="Print help message")
+@click.pass_context
+def image(ctx, proc_img_path, proc_img_url, segments, all_set, model_path):
 	''' Show processed image '''
-	if not segments:
-		processimages.main(proc_img_path, all_set)
+	
+	if not segments and ((1 if proc_img_path != None else 0)+(1 if proc_img_url != None else 0)+(1 if all_set else 0)) == 1:
+		processimages.main(proc_img_path, proc_img_url, all_set, None, model_path)
+	else:
+		print_help(ctx, None,  value=True)
 
 @view.command()
 @click.argument('proc_img_path', callback=validators.check_if_file_exists)

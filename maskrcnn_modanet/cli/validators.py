@@ -21,3 +21,25 @@ def check_if_file_exists(ctx, param, value):
 	while not os.path.isfile(value):
 		value = os.path.abspath(input("This file doesn't exist. Insert it again here: "))
 	return value
+
+def check_if_url_downloadable(ctx, param, value):
+	''' check_if_url_downloadable '''
+	if value == None: return value
+
+	while not is_downloadable(value):
+		value = input("This url can't be downloaded. Insert it again here: ")
+	return value
+
+def is_downloadable(url):
+	"""
+	Does the url contain a downloadable resource
+	"""
+	import requests
+	h = requests.head(url, allow_redirects=True)
+	header = h.headers
+	content_type = header.get('content-type')
+	if 'text' in content_type.lower():
+	    return False
+	if 'html' in content_type.lower():
+	    return False
+	return True

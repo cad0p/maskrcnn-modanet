@@ -17,7 +17,7 @@ def get_session():
 	config.gpu_options.allow_growth = True
 	return tf.Session(config=config)
 
-def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
+def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None):
 	# import keras
 	import keras
 
@@ -69,17 +69,27 @@ def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
 			instances = json.load(f)
 		images = instances['images']
 
-	else:
+	elif proc_img_path != None:
 		# just draw the image selected
-		images = [read_image_bgr(proc_img_path)]
+		images = [{'file_name': proc_img_path}]
+	elif proc_img_url != None:
+		# just draw the image selected
+		images = [{'file_name': proc_img_url}]
 
 
 	try:
 		#for each image in the dataset
-		for img in instances['images']:
+		for img in images:
 
-
-			image = read_image_bgr(img_path + img['file_name'])
+			if all_set:
+				image = read_image_bgr(img_path + img['file_name'])
+			elif proc_img_path != None:
+				image = read_image_bgr(img['file_name'])
+			elif proc_img_url != None:
+				import requests
+				from io import BytesIO
+				r = requests.get(img['file_name'], allow_redirects=True)
+				image = read_image_bgr(BytesIO(r.content))
 
 			# copy to draw on
 			draw = image.copy()
