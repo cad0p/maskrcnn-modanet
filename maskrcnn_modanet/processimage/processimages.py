@@ -46,7 +46,7 @@ def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
 	# adjust this to point to your trained model
 	if model_path == None:
 		# get all models names in the results folder
-		modelnames = [f for f in listdir(snp_path) if isfile(join(snp_path, f))]
+		modelnames = [f for f in os.listdir(snp_path) if os.path.isfile(os.path.join(snp_path, f))]
 		import re
 
 		def extract_number(f):
