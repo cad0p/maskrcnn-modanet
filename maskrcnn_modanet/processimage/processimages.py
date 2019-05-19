@@ -33,6 +33,7 @@ def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
 	import cv2
 	import numpy as np
 	import time
+	from keyboard import is_pressed
 
 	# set tf backend to allow memory to grow, instead of claiming everything
 	import tensorflow as tf
@@ -90,7 +91,7 @@ def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
 		# process image
 		start = time.time()
 		outputs = model.predict_on_batch(np.expand_dims(image, axis=0))
-		print("processing time: ", time.time() - start)
+		print("processing time: ", time.time() - start, " (press enter to exit)")
 
 		boxes  = outputs[-4][0]
 		scores = outputs[-3][0]
@@ -120,3 +121,6 @@ def main(proc_img_path=None, all_set=True, save_path=None, model_path=None):
 		plt.axis('off')
 		plt.imshow(draw)
 		plt.show()
+
+		if is_pressed('enter'):
+			break

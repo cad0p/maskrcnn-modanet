@@ -29,7 +29,8 @@ setuptools.setup(
       'sqlalchemy',
       'Cython',
       'numpy',
-      'pycocotools'
+      'pycocotools',
+      'keyboard'
     ],
     entry_points = {
         'console_scripts': [
