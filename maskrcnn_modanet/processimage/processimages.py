@@ -18,56 +18,64 @@ def get_session():
 	return tf.Session(config=config)
 
 def draw_mask_only(image, box, mask, label=None, color=None, binarize_threshold=0.5):
-    """ Draws a mask in a given box and makes everything else black.
-    Args
-        image              : Three dimensional image to draw on.
-        box                : Vector of at least 4 values (x1, y1, x2, y2) representing a box in the image.
-        mask               : A 2D float mask which will be reshaped to the size of the box, binarized and drawn over the image.
-        color              : Color to draw the mask with. If the box has 5 values, the last value is assumed to be the label and used to construct a default color.
-        binarize_threshold : Threshold used for binarizing the mask.
-    """
-    if label is not None:
-        color = label_color(label)
-    if color is None:
-        color = (0, 255, 0)
+	""" Draws a mask in a given box and makes everything else black.
+	Args
+	    image              : Three dimensional image to draw on.
+	    box                : Vector of at least 4 values (x1, y1, x2, y2) representing a box in the image.
+	    mask               : A 2D float mask which will be reshaped to the size of the box, binarized and drawn over the image.
+	    color              : Color to draw the mask with. If the box has 5 values, the last value is assumed to be the label and used to construct a default color.
+	    binarize_threshold : Threshold used for binarizing the mask.
+	"""
 
-    # resize to fit the box
-    mask = mask.astype(np.float32)
-    mask = cv2.resize(mask, (box[2] - box[0], box[3] - box[1]))
+	from keras_retinanet.utils.colors import label_color
 
-    # binarize the mask
-    mask = (mask > binarize_threshold).astype(np.uint8)
+	# import miscellaneous modules
+	import cv2
+	import numpy as np
 
-    # draw the mask in the image
-    mask_image = np.zeros((image.shape[0], image.shape[1]), np.uint8)
-    mask_image[box[1]:box[3], box[0]:box[2]] = mask
-    mask = mask_image
 
-    # compute a nice border around the mask
-    border = mask - cv2.erode(mask, np.ones((5, 5), np.uint8), iterations=1)
+	if label is not None:
+	    color = label_color(label)
+	if color is None:
+	    color = (0, 255, 0)
 
-    # apply color to the mask and border
-    mask = (np.stack([mask] * 3, axis=2) * color).astype(np.uint8)
-    border = (np.stack([border] * 3, axis=2) * (255, 255, 255)).astype(np.uint8)
+	# resize to fit the box
+	mask = mask.astype(np.float32)
+	mask = cv2.resize(mask, (box[2] - box[0], box[3] - box[1]))
 
-    # this is how you look into the mask
-    # for i in mask:
-    # 	for j in i:
-    # 		b = False
-    # 		for k in i:
-    # 			for l in k:
-    # 				if l != 0:
-    # 					b = True
-    # 				if b:
-    # 					break
-    # 			if b:
-    # 				break
-    # 		if b:
-    # 			print (j)
+	# binarize the mask
+	mask = (mask > binarize_threshold).astype(np.uint8)
 
-    # draw the mask
-    indices = np.where(mask != color)
-    image[indices[0], indices[1], :] = 0 * image[indices[0], indices[1], :] 
+	# draw the mask in the image
+	mask_image = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+	mask_image[box[1]:box[3], box[0]:box[2]] = mask
+	mask = mask_image
+
+	# compute a nice border around the mask
+	border = mask - cv2.erode(mask, np.ones((5, 5), np.uint8), iterations=1)
+
+	# apply color to the mask and border
+	mask = (np.stack([mask] * 3, axis=2) * color).astype(np.uint8)
+	border = (np.stack([border] * 3, axis=2) * (255, 255, 255)).astype(np.uint8)
+
+	# this is how you look into the mask
+	# for i in mask:
+	# 	for j in i:
+	# 		b = False
+	# 		for k in i:
+	# 			for l in k:
+	# 				if l != 0:
+	# 					b = True
+	# 				if b:
+	# 					break
+	# 			if b:
+	# 				break
+	# 		if b:
+	# 			print (j)
+
+	# draw the mask
+	indices = np.where(mask != color)
+	image[indices[0], indices[1], :] = 0 * image[indices[0], indices[1], :]
 
 def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None, segments=False):
 	# import keras
@@ -164,14 +172,17 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 			# correct for image scale
 			boxes /= scale
 
+			i = 0
 			# visualize detections
 			for box, score, label, mask in zip(boxes, scores, labels, masks):
-			    if score < 0.5:
-			        break
+				if score < 0.5:
+					print (score)
+					skip = True
+				else:
+					skip = False
+				color = label_color(label)
 
-			    color = label_color(label)
-			    
-			    if not segments:
+				if not segments and not skip:
 					b = box.astype(int)
 					draw_box(draw, b, color=color)
 
@@ -180,7 +191,8 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 
 					caption = "{} {:.3f}".format(labels_to_names[label], score)
 					draw_caption(draw, b, caption)
-			    elif segments:
+				elif segments and not skip:
+					print(i, "segments", end=' ')
 					b = box.astype(int)
 					# draw_box(draw, b, color=color)
 
@@ -189,12 +201,17 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 					draw_mask_only(drawclone, b, mask, color=label_color(label))
 
 					caption = "{} {:.3f}".format(labels_to_names[label], score)
-					draw_caption(draw, b, caption)
+					draw_caption(drawclone, b, caption)
 					plt.figure(figsize=(15, 15))
 					plt.axis('off')
 					plt.imshow(drawclone)
-					plt.show()
-			
+					# plt.show()
+				elif skip:
+					print(i, "skip", end=' ')
+				else:
+					print(i, "else", end=' ')
+				i += 1
+
 			if not segments:    
 				plt.figure(figsize=(15, 15))
 				plt.axis('off')
