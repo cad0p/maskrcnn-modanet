@@ -172,17 +172,13 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 			# correct for image scale
 			boxes /= scale
 
-			i = 0
 			# visualize detections
 			for box, score, label, mask in zip(boxes, scores, labels, masks):
 				if score < 0.5:
-					print (score)
-					skip = True
-				else:
-					skip = False
+					break
 				color = label_color(label)
 
-				if not segments and not skip:
+				if not segments:
 					b = box.astype(int)
 					draw_box(draw, b, color=color)
 
@@ -191,13 +187,13 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 
 					caption = "{} {:.3f}".format(labels_to_names[label], score)
 					draw_caption(draw, b, caption)
-				elif segments and not skip:
-					print(i, "segments", end=' ')
+				elif segments:
+					drawclone = np.copy(draw)
+
 					b = box.astype(int)
-					# draw_box(draw, b, color=color)
+					# draw_box(drawclone, b, color=color)
 
 					mask = mask[:, :, label]
-					drawclone = np.copy(draw)
 					draw_mask_only(drawclone, b, mask, color=label_color(label))
 
 					caption = "{} {:.3f}".format(labels_to_names[label], score)
@@ -205,12 +201,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 					plt.figure(figsize=(15, 15))
 					plt.axis('off')
 					plt.imshow(drawclone)
-					# plt.show()
-				elif skip:
-					print(i, "skip", end=' ')
-				else:
-					print(i, "else", end=' ')
-				i += 1
+					plt.show()
 
 			if not segments:    
 				plt.figure(figsize=(15, 15))
