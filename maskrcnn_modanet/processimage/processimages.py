@@ -44,7 +44,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 	keras.backend.tensorflow_backend.set_session(get_session())
 
 	# adjust this to point to your trained model
-	if model_path == None:
+	if not model_path:
 		# get all models names in the results folder
 		modelnames = [f for f in os.listdir(snp_path) if os.path.isfile(os.path.join(snp_path, f))]
 		import re
@@ -69,10 +69,10 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 			instances = json.load(f)
 		images = instances['images']
 
-	elif proc_img_path != None:
+	elif proc_img_path:
 		# just draw the image selected
 		images = [{'file_name': proc_img_path}]
-	elif proc_img_url != None:
+	elif proc_img_url:
 		# just draw the image selected
 		images = [{'file_name': proc_img_url}]
 
@@ -83,9 +83,9 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 
 			if all_set:
 				image = read_image_bgr(img_path + img['file_name'])
-			elif proc_img_path != None:
+			elif proc_img_path:
 				image = read_image_bgr(img['file_name'])
-			elif proc_img_url != None:
+			elif proc_img_url:
 				import requests
 				from io import BytesIO
 				r = requests.get(img['file_name'], allow_redirects=True)
