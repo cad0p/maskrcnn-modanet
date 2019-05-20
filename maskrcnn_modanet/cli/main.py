@@ -153,8 +153,8 @@ def save():
 def image(ctx, proc_img_path, proc_img_url, segments, all_set, model_path):
 	''' Show processed image '''
 	
-	if not segments and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		processimages.main(proc_img_path, proc_img_url, all_set, None, model_path)
+	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
+		processimages.main(proc_img_path, proc_img_url, all_set, None, model_path, segments)
 	else:
 		print_help(ctx, None,  value=True)
 
