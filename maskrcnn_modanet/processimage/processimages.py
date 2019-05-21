@@ -123,6 +123,11 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 	# load label to names mapping for visualization purposes
 	labels_to_names = {0: 'bag', 1: 'belt', 2: 'boots', 3: 'footwear', 4: 'outer', 5: 'dress', 6: 'sunglasses', 7: 'pants', 8: 'top', 9: 'shorts', 10: 'skirt', 11: 'headwear', 12: 'scarf/tie'}
 
+	if save_path == 'default':
+		# set path to default
+		save_path = path + 'results/processedimages/images/1.jpg'
+
+
 	if all_set:
 		# load images
 		with open(ann_path + 'instances_val.json') as f:
@@ -207,6 +212,10 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 				plt.figure(figsize=(15, 15))
 				plt.axis('off')
 				plt.imshow(draw)
-				plt.show()
+				if not save_path:
+					plt.show()
+				else:
+					print(save_path)
+					plt.savefig(save_path)
 	except KeyboardInterrupt:
 		pass

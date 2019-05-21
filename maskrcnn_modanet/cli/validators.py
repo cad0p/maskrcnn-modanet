@@ -43,3 +43,15 @@ def is_downloadable(url):
 	if 'html' in content_type.lower():
 	    return False
 	return True
+
+def check_if_file_folder_exists(ctx, param, value):
+	""" check_if_file_folder_exists and if not, create it """
+	if value == None or value == 'default':
+		return value
+	# making path absolute
+	value = os.path.abspath(value)
+	value_folder = os.path.dirname(value)
+	if not os.path.exists(value_folder):
+		os.makedirs(value_folder)
+	
+	return value

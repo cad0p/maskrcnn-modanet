@@ -1,7 +1,7 @@
 import click, json, os
 
 from . import validators
-from maskrcnn_modanet.processimage import processimages, processimagesegments
+from maskrcnn_modanet.processimage import processimages
 
 
 def print_help(ctx, param, value):
@@ -148,7 +148,6 @@ def save():
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
-@click.option('--help', is_flag=True, expose_value=False, is_eager=False, callback=print_help, help="Print help message")
 @click.pass_context
 def image(ctx, proc_img_path, proc_img_url, segments, all_set, model_path):
 	''' Show processed image '''
@@ -165,14 +164,19 @@ def annotations(proc_img_path):
 	pass
 
 @save.command()
-@click.argument('proc_img_path', callback=validators.check_if_file_exists)
-@click.argument('save_path')
+@click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
+@click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
-def image(proc_img_path, segments, all_set, model_path):
+@click.option('--save-path', default='default', callback=validators.check_if_file_folder_exists, help='Set your save path (including extension .jpg). Defaults inside the processimages folder')
+@click.pass_context
+def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_path):
 	''' Save processed image '''
-	pass
+	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
+		processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, False)
+	else:
+		print_help(ctx, None,  value=True)
 
 @save.command()
 @click.argument('proc_img_path', callback=validators.check_if_file_exists)

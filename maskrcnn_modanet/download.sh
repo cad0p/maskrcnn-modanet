@@ -70,7 +70,15 @@ mkdir results
 cd results
 pwd
 mkdir snapshots
+mkdir processedimages
 mkdir logs
+
+cd processedimages
+pwd
+mkdir images
+mkdir imagesegments
+mkdir annotations
+
 
 # does not show folders named lib (which clutter the graph)
 tree -d $PATH1 -I lib --matchdirs
