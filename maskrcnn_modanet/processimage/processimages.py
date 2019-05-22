@@ -129,12 +129,12 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 
 	if annotations:
 		if save_path: save_path = path + 'results/processedimages/annotations/1.json'
-		annotations = {
-			'bbox': [],
-			'score': [],
-			'category': [],
-			'part' : []
-		}
+		annotations = [{
+			'bbox': None,
+			'score': None,
+			'category': None,
+			'part' : None
+		}]
 
 
 	if all_set:
@@ -186,6 +186,15 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 			# correct for image scale
 			boxes /= scale
 
+			if annotations:
+				annotations = [{
+								'bbox': None,
+								'score': None,
+								'category': None,
+								'part' : None
+				} for i in range(len(boxes))]
+
+			i = 0
 			# visualize detections
 			for box, score, label, mask in zip(boxes, scores, labels, masks):
 				if score < 0.5:
@@ -218,10 +227,11 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 						plt.imshow(drawclone)
 						plt.show()
 					elif annotations:
-						annotations['bbox'].append(b)
-						annotations['score'].append(score)
-						annotations['category'].append(label)
-						annotations['part'].append(drawclone) # only the object inside the mask is shown, the rest is black
+						annotations[i]['bbox'] = b
+						annotations[i]['score'] = score
+						annotations[i]['category'] = label
+						annotations[i]['part'] = drawclone # only the object inside the mask is shown, the rest is black
+				i += 1
 						
 			if not segments:    
 				plt.figure(figsize=(15, 15))
