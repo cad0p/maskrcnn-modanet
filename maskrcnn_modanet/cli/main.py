@@ -153,15 +153,23 @@ def image(ctx, proc_img_path, proc_img_url, segments, all_set, model_path):
 	''' Show processed image '''
 	
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		processimages.main(proc_img_path, proc_img_url, all_set, None, model_path, segments)
+		processimages.main(proc_img_path, proc_img_url, all_set, None, model_path, segments, False)
 	else:
 		print_help(ctx, None,  value=True)
 
 @view.command()
-@click.argument('proc_img_path', callback=validators.check_if_file_exists)
-def annotations(proc_img_path):
+@click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
+@click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
+@click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
+@click.pass_context
+def annotations(ctx, proc_img_path, proc_img_url, model_path):
 	''' Show processed image annotations '''
-	pass
+	segments = True; all_set = False
+	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
+		print(processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, segments, True)) #function returns the annotations
+	else:
+		print_help(ctx, None,  value=True)
+
 
 @save.command()
 @click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
@@ -174,14 +182,20 @@ def annotations(proc_img_path):
 def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_path):
 	''' Save processed image '''
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, False)
+		processimages.main(proc_img_path, proc_img_url, False, None, model_path, False, False)
 	else:
 		print_help(ctx, None,  value=True)
 
 @save.command()
-@click.argument('proc_img_path', callback=validators.check_if_file_exists)
-@click.argument('save_path')
-def annotations(proc_img_path):
+@click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
+@click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
+@click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
+@click.option('--save-path', default='default', callback=validators.check_if_file_folder_exists, help='Set your save path (including extension .jpg). Defaults inside the processimages folder')
+@click.pass_context
+def annotations(ctx, proc_img_path, proc_img_url, save_path, model_path):
 	''' Save processed image annotations '''
-	pass
-
+	segments = True; all_set = False
+	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
+		processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, segments, True)
+	else:
+		print_help(ctx, None,  value=True)

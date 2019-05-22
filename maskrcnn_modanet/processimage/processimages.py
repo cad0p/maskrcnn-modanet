@@ -77,7 +77,7 @@ def draw_mask_only(image, box, mask, label=None, color=None, binarize_threshold=
 	indices = np.where(mask != color)
 	image[indices[0], indices[1], :] = 0 * image[indices[0], indices[1], :]
 
-def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None, segments=False):
+def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None, segments=False, annotations=False):
 	# import keras
 	import keras
 
@@ -126,6 +126,15 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 	if save_path == 'default':
 		# set path to default
 		save_path = path + 'results/processedimages/images/1.jpg'
+
+	if annotations:
+		save_path = path + 'results/processedimages/annotations/1.json'
+		annotations = {
+			'bbox': [],
+			'score': [],
+			'category': [],
+			'part' : []
+		}
 
 
 	if all_set:
@@ -200,22 +209,36 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 
 					mask = mask[:, :, label]
 					draw_mask_only(drawclone, b, mask, color=label_color(label))
-
-					caption = "{} {:.3f}".format(labels_to_names[label], score)
-					draw_caption(drawclone, b, caption)
-					plt.figure(figsize=(15, 15))
-					plt.axis('off')
-					plt.imshow(drawclone)
-					plt.show()
-
+					
+					if not annotations:
+						caption = "{} {:.3f}".format(labels_to_names[label], score)
+						draw_caption(drawclone, b, caption)
+						plt.figure(figsize=(15, 15))
+						plt.axis('off')
+						plt.imshow(drawclone)
+						plt.show()
+					elif annotations:
+						annotations['bbox'].append(b)
+						annotations['score'].append(score)
+						annotations['category'].append(label)
+						annotations['part'].append(drawclone) # only the object inside the mask is shown, the rest is black
+						
 			if not segments:    
 				plt.figure(figsize=(15, 15))
 				plt.axis('off')
 				plt.imshow(draw)
 				if not save_path:
 					plt.show()
-				else:
+				elif save_path:
 					print(save_path)
 					plt.savefig(save_path)
+			elif segments:
+				if annotations:
+					if save_path:
+						with open(save_path, 'w') as outfile:
+							json.dump(annotations, outfile)
+					else:
+						return annotations
+
 	except KeyboardInterrupt:
 		pass
