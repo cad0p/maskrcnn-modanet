@@ -77,7 +77,7 @@ def draw_mask_only(image, box, mask, label=None, color=None, binarize_threshold=
 	indices = np.where(mask != color)
 	image[indices[0], indices[1], :] = 0 * image[indices[0], indices[1], :]
 
-def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None, segments=False, annotations=False):
+def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None, segments=False, annotations=False, threshold_score=0.5):
 	# import keras
 	import keras
 
@@ -192,12 +192,12 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 								'score': None,
 								'category': None,
 								'part' : None
-				} for i in range(len(boxes))]
+				} for i in range(len([score for score in scores if score >= threshold_score]))]
 
 			i = 0
 			# visualize detections
 			for box, score, label, mask in zip(boxes, scores, labels, masks):
-				if score < 0.5:
+				if score < threshold_score:
 					break
 				color = label_color(label)
 
@@ -253,3 +253,72 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 
 	except KeyboardInterrupt:
 		pass
+
+
+def apply_mask(model, image):
+	''' Process image numpy matrix using model and return the annotations '''
+
+
+
+	from keras_retinanet.utils.image import preprocess_image, resize_image
+	from keras_retinanet.utils.colors import label_color
+
+	# import miscellaneous modules
+	import numpy as np
+	import time
+
+
+	# load label to names mapping for visualization purposes
+	labels_to_names = {0: 'bag', 1: 'belt', 2: 'boots', 3: 'footwear', 4: 'outer', 5: 'dress', 6: 'sunglasses', 7: 'pants', 8: 'top', 9: 'shorts', 10: 'skirt', 11: 'headwear', 12: 'scarf/tie'}
+
+	# copy to draw on
+	draw = image.copy()
+
+	# preprocess image for network
+	image = preprocess_image(image)
+	image, scale = resize_image(image)
+
+	# process image
+	start = time.time()
+	outputs = model.predict_on_batch(np.expand_dims(image, axis=0))
+	print("processing time: ", time.time() - start)
+
+	boxes  = outputs[-4][0]
+	scores = outputs[-3][0]
+	labels = outputs[-2][0]
+	masks  = outputs[-1][0]
+
+	# correct for image scale
+	boxes /= scale
+
+	annotations = [{
+					'bbox': None,
+					'score': None,
+					'category': None,
+					'part' : None
+	} for i in range(len([score for score in scores if score >= threshold_score]))]
+
+	i = 0
+	# visualize detections
+	for box, score, label, mask in zip(boxes, scores, labels, masks):
+		if score < threshold_score:
+			break
+		color = label_color(label)
+
+
+		drawclone = np.copy(draw)
+
+		b = box.astype(int)
+
+		mask = mask[:, :, label]
+		draw_mask_only(drawclone, b, mask, color=label_color(label))
+		
+
+		annotations[i]['bbox'] = b
+		annotations[i]['score'] = score
+		annotations[i]['category'] = label
+		annotations[i]['part'] = drawclone # only the object inside the mask is shown, the rest is black
+		i += 1
+
+
+	return annotations

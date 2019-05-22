@@ -1,7 +1,7 @@
 """CLI validation."""
 
 import os
-
+from click import BadOptionUsage
 
 def check_if_folder_exists(ctx, param, value):
 	""" check_if_folder_exists and if not, create it """
@@ -14,28 +14,28 @@ def check_if_folder_exists(ctx, param, value):
 
 
 def check_if_file_exists(ctx, param, value):
-	""" check_if_file_exists and if not, ask again """
+	""" check_if_file_exists and if not, raise error """
 	# making path absolute
 	if value == None: return value
 	value = os.path.abspath(value)
-	while not os.path.isfile(value):
-		value = os.path.abspath(input("This file doesn't exist. Insert it again here: "))
+	if not os.path.isfile(value):
+		raise BadParameter("This file doesn't exist.", ctx, param)
 	return value
 
 def check_if_url_downloadable(ctx, param, value):
-	''' check_if_url_downloadable '''
+	''' check_if_url_downloadable and raise error if not '''
 	if value == None: return value
 
-	while not is_downloadable(value):
-		value = input("This url can't be downloaded. Insert it again here: ")
+	if not is_downloadable(value):
+		raise BadParameter("This url can't be downloaded.", ctx, param)
 	return value
 
 def is_downloadable(url):
 	"""
 	Does the url contain a downloadable resource
 	"""
-	import requests
-	h = requests.head(url, allow_redirects=True)
+	from requests import head
+	h = head(url, allow_redirects=True)
 	header = h.headers
 	content_type = header.get('content-type')
 	if 'text' in content_type.lower():
@@ -54,4 +54,10 @@ def check_if_file_folder_exists(ctx, param, value):
 	if not os.path.exists(value_folder):
 		os.makedirs(value_folder)
 	
+	return value
+
+def check_if_score_is_valid(ctx, param, value):
+	''' check_if_score_is_valid and if not raise error (score between 0 and 1) '''
+	if not (0 <= value <= 1):
+		raise BadParameter("The threshold score must be between 0 and 1.", ctx, param)
 	return value
