@@ -1,7 +1,7 @@
 import click, json, os
 
 from . import validators
-from maskrcnn_modanet.processimage import processimages
+from maskrcnn_modanet import processimages
 
 
 def print_help(ctx, param, value):

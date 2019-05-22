@@ -1,7 +1,7 @@
 """CLI validation."""
 
 import os
-from click import BadOptionUsage
+from click import BadParameter
 
 def check_if_folder_exists(ctx, param, value):
 	""" check_if_folder_exists and if not, create it """
