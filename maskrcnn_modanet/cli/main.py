@@ -166,7 +166,7 @@ def annotations(ctx, proc_img_path, proc_img_url, model_path):
 	''' Show processed image annotations '''
 	segments = True; all_set = False
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		print(processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, segments, True)) #function returns the annotations
+		print(processimages.main(proc_img_path, proc_img_url, False, None, model_path, segments, True)) #function returns the annotations
 	else:
 		print_help(ctx, None,  value=True)
 

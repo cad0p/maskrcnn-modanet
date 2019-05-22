@@ -128,7 +128,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 		save_path = path + 'results/processedimages/images/1.jpg'
 
 	if annotations:
-		save_path = path + 'results/processedimages/annotations/1.json'
+		if save_path: save_path = path + 'results/processedimages/annotations/1.json'
 		annotations = {
 			'bbox': [],
 			'score': [],
@@ -235,6 +235,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 			elif segments:
 				if annotations:
 					if save_path:
+						print(save_path)
 						with open(save_path, 'w') as outfile:
 							json.dump(annotations, outfile)
 					else:
