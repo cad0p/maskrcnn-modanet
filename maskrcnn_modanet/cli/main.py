@@ -185,7 +185,7 @@ def annotations(ctx, proc_img_path, proc_img_url, model_path, threshold_score):
 def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_path, threshold_score):
 	''' Save processed image '''
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		processimages.main(proc_img_path, proc_img_url, False, None, model_path, False, False, threshold_score)
+		processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, segments, False, threshold_score)
 	else:
 		print_help(ctx, None,  value=True)
 

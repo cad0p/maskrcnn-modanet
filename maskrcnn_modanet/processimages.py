@@ -125,10 +125,14 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 
 	if save_path == 'default':
 		# set path to default
-		save_path = path + 'results/processedimages/images/1.jpg'
+		save_path = path + 'results/processedimages/'#images/1.jpg'
+		if not annotations:
+			save_path += 'images/'
+		elif annotations:
+			save_path += 'annotations/'
 
 	if annotations:
-		if save_path: save_path = path + 'results/processedimages/annotations/1.json'
+		# if save_path: save_path = path + 'results/processedimages/annotations/1.json'
 		annotations = [{
 			'bbox': None,
 			'score': None,
@@ -165,6 +169,21 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 				r = requests.get(img['file_name'], allow_redirects=True)
 				image = read_image_bgr(BytesIO(r.content))
 
+
+			if save_path == 'default':
+				if proc_img_path or all_set:
+					img_file_name = img['file_name'].split("/")[-1]
+				elif proc_img_url:
+					img_file_name = 'urlimg.jpg'
+				if not annotations:
+					save_path += img_file_name
+				elif annotations:
+					save_path += img_file_name.split('.')[0] + '.json'
+			if save_path and segments and not annotations:
+				#remove the extension
+				save_path = save_path.split('.')[0]
+
+
 			# copy to draw on
 			draw = image.copy()
 			draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
@@ -194,7 +213,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 								'part' : None
 				} for i in range(len([score for score in scores if score >= threshold_score]))]
 
-			i = 0
+			i = 0; segment_id = 0
 			# visualize detections
 			for box, score, label, mask in zip(boxes, scores, labels, masks):
 				if score < threshold_score:
@@ -225,7 +244,15 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 						plt.figure(figsize=(15, 15))
 						plt.axis('off')
 						plt.imshow(drawclone)
-						plt.show()
+						if not save_path:
+							plt.show()
+						elif save_path:
+							segment_path = '_segment_' + segment_id + '.jpg'
+							save_path_segment = save_path + segment_path
+							print(save_path_segment)
+							plt.savefig(save_path_segment)
+							segment_id += 1
+
 					elif annotations:
 						annotations[i]['bbox'] = b
 						annotations[i]['score'] = score
@@ -273,6 +300,10 @@ def apply_mask(model, image, threshold_score=0.5):
 
 	# copy to draw on
 	draw = image.copy()
+
+	#switching to RGB from BGR
+	draw[:, :, 2] = image[:, :, 0]
+	draw[:, :, 0] = image[:, :, 2]
 
 	# preprocess image for network
 	image = preprocess_image(image)
