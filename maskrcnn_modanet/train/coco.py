@@ -99,7 +99,7 @@ class CocoGenerator(Generator):
             'masks': [],
         }
 
-        # some images appear to miss annotations (like image with id 257034)
+        # some images might miss annotations
         if len(annotations_ids) == 0:
             return annotations
 
@@ -117,9 +117,9 @@ class CocoGenerator(Generator):
             annotations['bboxes'] = np.concatenate([annotations['bboxes'], [[
                 a['bbox'][0],
                 a['bbox'][1],
-                a['bbox'][0] + a['bbox'][2],
-                a['bbox'][1] + a['bbox'][3],
-            ]]], axis=0)
+                a['bbox'][0] + a['bbox'][2] if a['bbox'][0] + a['bbox'][2] <= image_info['width'] else image_info['width'],
+                a['bbox'][1] + a['bbox'][3] if a['bbox'][1] + a['bbox'][3] <= image_info['height'] else image_info['height'],
+            ]]], axis=0) # normalizing annotations that exit boundaries
 
             mask = np.zeros((image_info['height'], image_info['width'], 1), dtype=np.uint8)
             for seg in a['segmentation']:
