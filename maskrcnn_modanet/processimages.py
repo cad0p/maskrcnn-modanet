@@ -77,7 +77,7 @@ def draw_mask_only(image, box, mask, label=None, color=None, binarize_threshold=
 	indices = np.where(mask != color)
 	image[indices[0], indices[1], :] = 0 * image[indices[0], indices[1], :]
 
-def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None, segments=False, annotations=False, threshold_score=0.5):
+def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None, segments=False, annotations=False, threshold_score=0.5, limit=None):
 	# import keras
 	import keras
 
@@ -123,6 +123,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 	# load label to names mapping for visualization purposes
 	labels_to_names = {0: 'bag', 1: 'belt', 2: 'boots', 3: 'footwear', 4: 'outer', 5: 'dress', 6: 'sunglasses', 7: 'pants', 8: 'top', 9: 'shorts', 10: 'skirt', 11: 'headwear', 12: 'scarf/tie'}
 
+	default_save_path = False
 	if save_path == 'default':
 		# set path to default
 		save_path = path + 'results/processedimages/'#images/1.jpg'
@@ -130,6 +131,8 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 			save_path += 'images/'
 		elif annotations:
 			save_path += 'annotations/'
+		default_save_path = True
+		SAVE_PATH = save_path # used for multiple images
 
 	if annotations:
 		# if save_path: save_path = path + 'results/processedimages/annotations/1.json'
@@ -146,6 +149,8 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 		with open(ann_path + 'instances_val.json') as f:
 			instances = json.load(f)
 		images = instances['images']
+		for img in images:
+			img['file_name']  = img_path + img['file_name']
 
 	elif proc_img_path:
 		# just draw the image selected
@@ -157,10 +162,13 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 
 	try:
 		#for each image in the dataset
-		for img in images:
+		for i, img in enumerate(images):
+			print(i, end=' ')
+			if limit and i >= limit:
+				break
 
 			if all_set:
-				image = read_image_bgr(img_path + img['file_name'])
+				image = read_image_bgr(img['file_name'])
 			elif proc_img_path:
 				image = read_image_bgr(img['file_name'])
 			elif proc_img_url:
@@ -169,10 +177,10 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 				r = requests.get(img['file_name'], allow_redirects=True)
 				image = read_image_bgr(BytesIO(r.content))
 
-
-			if save_path == 'default':
+			if default_save_path:
 				if proc_img_path or all_set:
 					img_file_name = img['file_name'].split("/")[-1]
+
 				elif proc_img_url:
 					img_file_name = 'urlimg.jpg'
 				if not annotations:
@@ -213,7 +221,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 								'part' : None
 				} for i in range(len([score for score in scores if score >= threshold_score]))]
 
-			i = 0; segment_id = 0
+			segment_id = 0
 			# visualize detections
 			for box, score, label, mask in zip(boxes, scores, labels, masks):
 				if score < threshold_score:
@@ -251,24 +259,27 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 							save_path_segment = save_path + segment_path
 							print(save_path_segment)
 							plt.savefig(save_path_segment)
-							segment_id += 1
+							plt.close()
 
 					elif annotations:
-						annotations[i]['bbox'] = b
-						annotations[i]['score'] = score
-						annotations[i]['category'] = label
-						annotations[i]['part'] = drawclone # only the object inside the mask is shown, the rest is black
-				i += 1
+						annotations[segment_id]['bbox'] = b
+						annotations[segment_id]['score'] = score
+						annotations[segment_id]['category'] = label
+						annotations[segment_id]['part'] = drawclone # only the object inside the mask is shown, the rest is black
+				segment_id += 1
 						
 			if not segments:    
 				plt.figure(figsize=(15, 15))
 				plt.axis('off')
 				plt.imshow(draw)
 				if not save_path:
+					if not proc_img_url:
+						print(img['file_name'])
 					plt.show()
 				elif save_path:
 					print(save_path)
 					plt.savefig(save_path)
+					plt.close()
 			elif segments:
 				if annotations:
 					if save_path:
@@ -277,6 +288,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 							json.dump(annotations, outfile)
 					else:
 						return annotations
+			save_path = SAVE_PATH # restore path for next image
 
 	except KeyboardInterrupt:
 		pass

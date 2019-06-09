@@ -178,14 +178,15 @@ def annotations(ctx, proc_img_path, proc_img_url, model_path, threshold_score):
 @click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
+@click.option('-l', '--limit', default=None, type=int, help='Works with option -a. Only saves the first l number of results')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
 @click.option('-t', '--threshold-score', default=0.5, callback=validators.check_if_score_is_valid, help='Set the lowest level of confidence to show annotations for the image')
 @click.option('--save-path', default='default', callback=validators.check_if_file_folder_exists, help='Set your save path (including extension .jpg). Defaults inside the processimages folder')
 @click.pass_context
-def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_path, threshold_score):
+def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_path, threshold_score, limit):
 	''' Save processed image '''
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, segments, False, threshold_score)
+		processimages.main(proc_img_path, proc_img_url, all_set, save_path, model_path, segments, False, threshold_score, limit)
 	else:
 		print_help(ctx, None,  value=True)
 
