@@ -132,7 +132,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 		elif annotations:
 			save_path += 'annotations/'
 		default_save_path = True
-		SAVE_PATH = save_path # used for multiple images
+	SAVE_PATH = save_path # used for multiple images
 
 	if annotations:
 		# if save_path: save_path = path + 'results/processedimages/annotations/1.json'
