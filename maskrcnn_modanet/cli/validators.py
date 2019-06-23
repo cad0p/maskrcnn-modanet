@@ -22,6 +22,21 @@ def check_if_file_exists(ctx, param, value):
 		raise BadParameter("This file doesn't exist.", ctx, param)
 	return value
 
+def check_if_image_exists_in_dataset(ctx, param, value):
+	''' check_if_image_exists_in_dataset and if not, raise error '''
+	import json
+	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
+		savedvars = json.load(f)
+	path = savedvars['datapath']
+	images_path = path + "datasets/coco/images/"
+	#making path absolute
+	value_path = images_path + value
+
+	# checking if image exists in dataset
+	if not os.path.isfile(value_path):
+		raise BadParameter("This image doesn't exist in the database. Check if your input is similar to \'01234.jpg\'", ctx, param)
+	return value
+
 def check_if_url_downloadable(ctx, param, value):
 	''' check_if_url_downloadable and raise error if not '''
 	if value == None: return value

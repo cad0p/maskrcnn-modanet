@@ -60,6 +60,20 @@ def processimage():
 	''' View and save processed image and annotations from input image '''
 	pass
 
+@main.command()
+@click.option('-p', '--img-path', callback=validators.check_if_image_exists_in_dataset, help='Only the image filename, like \'01234.jpg\'. It must be in the dataset\'s images folder')
+@click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
+@click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in all the dataset')
+@click.pass_context
+def viewimage(ctx, img_path, segments, all_set):
+	''' View and (not yet needed) save dataset images, plain (not yet needed) or annotated. Useful to check the dataset annotations on the dataset and compare them with the prediction!
+		Runs without GPU need '''
+	from maskrcnn_modanet.viewimages import viewImages
+	if (not segments or (segments and not all_set) ) and ((1 if img_path else 0)+(1 if all_set else 0)) == 1:
+		viewImages(img_path, segments, all_set)
+	else:
+		print_help(ctx, None,  value=True)
+
 
 @datasets.command()
 @click.argument('path', callback=validators.check_if_folder_exists)
