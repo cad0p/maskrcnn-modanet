@@ -11,23 +11,32 @@ My bachelor's thesis project.
 This project is written in Python 3, so it works in all major OSes.
 Keep in mind to use pip or pip3 depending on your settings.
 
+Clone this repo
+
 Run `pip install maskrcnn-modanet --user`
+
+Or go to the repo you just cloned on the terminal and run `pip install . -e --user`
 
 Now that you've installed it, run `maskrcnn-modanet datasets download the/folder/you/want/to/put/data/in`
 
+It will take a while, about 40GB to download!
+
+Then you can explore its features and commands by running `maskrcnn-modanet`
+
 ### Prerequisites
 
-Install Matlab
+Install Python and Keras
 
-## Files used
+<!--## Files used
 
-* teslasheet [on my Drive](https://docs.google.com/spreadsheets/d/1wCQQs4Db_8AbxcvRWW3v0yB4pYNEC7v6ckFMnnmIEE4/edit?usp=sharing) - created with [SourceFiles](SourceFiles) taken from [Tesla Motors Club Forum](https://teslamotorsclub.com/tmc/threads/breaking-down-the-model-s-range-calculator-hidden-features-and-data.94675/#post-2692441)
+* teslasheet [on my Drive](https://docs.google.com/spreadsheets/d/1wCQQs4Db_8AbxcvRWW3v0yB4pYNEC7v6ckFMnnmIEE4/edit?usp=sharing) - created with [SourceFiles](SourceFiles) taken from [Tesla Motors Club Forum](https://teslamotorsclub.com/tmc/threads/breaking-down-the-model-s-range-calculator-hidden-features-and-data.94675/#post-2692441)-->
 
 ## Built With
 
 * [Sublime Text](https://www.sublimetext.com/) - The text editor used
-* [Matlab](mathworks.com) - To develop initially
+* [Python 3](https://www.python.org) - Language utilized
 * [GitHub Desktop](https://desktop.github.com/) - To manage developement
+* [Sublime Merge](https://www.sublimemerge.com/) - To manage developement
 
 ## Contributing
 
