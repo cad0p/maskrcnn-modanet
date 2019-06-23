@@ -27,6 +27,7 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None):
 	import numpy as np
 	import time
 
+
 	# load annotations
 	with open(ann_path + 'instances_all.json') as f:
 			instances = json.load(f)
@@ -36,13 +37,13 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None):
 		'file_name': 'id'
 	}
 
-	for i, img in enumerate(instances['images']):
-		images_ids[img['file_name']] = i
+	for img in instances['images']:
+		images_ids[img['file_name']] = img['id']
 
 	# images_anns contains all the annotations for each image_id. 
 	# the key is the image_id, 
 	# the value is a list of the annotations for that id
-	images_anns = [ [None] for i in range(1115985) ]
+	images_anns = [ [] for i in range(1115985) ]
 	
 	# load label to names mapping for visualization purposes
 	labels_to_names = {0: 'bag', 1: 'belt', 2: 'boots', 3: 'footwear', 4: 'outer', 5: 'dress', 6: 'sunglasses', 7: 'pants', 8: 'top', 9: 'shorts', 10: 'skirt', 11: 'headwear', 12: 'scarf/tie'}
@@ -78,7 +79,6 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None):
 		for ann in instances['annotations']:
 			if ann['image_id'] == img_id:
 				images_anns[img_id].append(ann)
-
 
 	try:
 		#for each image in the dataset

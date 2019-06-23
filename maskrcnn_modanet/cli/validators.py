@@ -24,6 +24,7 @@ def check_if_file_exists(ctx, param, value):
 
 def check_if_image_exists_in_dataset(ctx, param, value):
 	''' check_if_image_exists_in_dataset and if not, raise error '''
+	if value == None: return value
 	import json
 	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
 		savedvars = json.load(f)
