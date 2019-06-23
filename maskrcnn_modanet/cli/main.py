@@ -75,6 +75,19 @@ def viewimage(ctx, img_path, segments, all_set):
 		print_help(ctx, None,  value=True)
 
 
+@main.command()
+@click.option('-p', '--img-path', callback=validators.check_if_image_exists_in_dataset, help='Only the image filename, like \'01234.jpg\'. It must be in the dataset\'s images folder')
+@click.pass_context
+def viewannotation(ctx, img_path):
+	''' View and (not yet needed) save dataset images, plain (not yet needed) or annotated. Useful to check the dataset annotations on the dataset and compare them with the prediction!
+		Runs without GPU need '''
+	from maskrcnn_modanet.viewannotations import viewAnnotations
+	if img_path:
+		print(viewAnnotations(img_path))
+	else:
+		print_help(ctx, None,  value=True)
+
+
 @datasets.command()
 @click.argument('path', callback=validators.check_if_folder_exists)
 def download(path):

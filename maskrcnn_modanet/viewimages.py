@@ -20,6 +20,7 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None):
 	from keras_retinanet.utils.visualization import draw_box, draw_caption, draw_annotations
 	from keras_retinanet.utils.image import read_image_bgr
 	from keras_retinanet.utils.colors import label_color
+	from pycocotools import mask as mask_utils
 
 	# import miscellaneous modules
 	import matplotlib.pyplot as plt
@@ -37,8 +38,13 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None):
 		'file_name': 'id'
 	}
 
+	#images_filenames = [None] * 1115985
+
+
 	for img in instances['images']:
 		images_ids[img['file_name']] = img['id']
+		#images_filenames[img['id']] = img['file_name']
+
 
 	# images_anns contains all the annotations for each image_id. 
 	# the key is the image_id, 
@@ -116,26 +122,31 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None):
 
 				box = ann['bbox']
 				label = ann['category_id'] - 1 # they start from 1 in the annotations
-				mask = ann['segmentation']
+				segmentation = ann['segmentation']
+
+				box[2] += box[0]
+				box[3] += box[1]
 
 				color = label_color(label)
 
+				#mask = mask_utils.decode(np.asfortranarray(segmentation))
+
 				if not segments:
-					b = box.astype(int)
+					b = np.array(box)
 					draw_box(draw, b, color=color)
+					
+					#draw_mask(draw, b, mask, color=label_color(label))
 
-					draw_mask(draw, b, mask, color=label_color(label))
-
-					caption = "{} {:.3f}".format(labels_to_names[label], score)
+					caption = "{}".format(labels_to_names[label])
 					draw_caption(draw, b, caption)
 				elif segments:
 					drawclone = np.copy(draw)
 
-					b = box.astype(int)
-					# draw_box(drawclone, b, color=color)
+					b = np.array(box)
+					draw_box(drawclone, b, color=color)
 
-					mask = mask[:, :, label]
-					draw_mask_only(drawclone, b, mask, color=label_color(label))
+					
+					#draw_mask_only(drawclone, b, mask, color=label_color(label))
 
 					caption = "{} {:.3f}".format(labels_to_names[label], score)
 					draw_caption(drawclone, b, caption)
@@ -159,8 +170,8 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None):
 				plt.axis('off')
 				plt.imshow(draw)
 				if not save_path:
-					if not proc_img_url:
-						print(img['file_name'])
+
+					print(img['file_name'])
 					plt.show()
 				elif save_path:
 					print(save_path)
