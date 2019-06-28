@@ -95,6 +95,17 @@ def viewannotation(ctx, img_path, original):
 	else:
 		print_help(ctx, None,  value=True)
 
+@main.command()
+@click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='The path to the .h5 model you want to evaluate (usually in results/snapshots)')
+@click.pass_context
+def evaluate(ctx, model_path):
+	''' Evaluate any trained model, average precision and recall. '''
+	from maskrcnn_modanet.evaluatemodel import evaluateModel
+	if model_path:
+		evaluateModel(model_path)
+	else:
+		print_help(ctx, None,  value=True)
+
 
 @datasets.command()
 @click.argument('path', callback=validators.check_if_folder_exists)
@@ -103,6 +114,9 @@ def download(path):
 		It will be about 50 GB 
 
 	(of which most can be deleted afterwards if not wanted)
+
+	if you already have the photos.lmdb file lying around, just wait until the program starts
+	downloading it, stop it and put the file into the ./datasets/paperdoll/data/chictopia folder.
 	 '''
 
 

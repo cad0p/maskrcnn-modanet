@@ -23,6 +23,10 @@ pwd
 
 if [ ! -d "./photos.lmdb" ]
 then
+	echo "If you already have the 40GB file lying around, you can stop the download by closing this program now,"
+	echo "putting the photos.lmdb file into ./datasets/paperdoll/data/chictopia"
+	echo "and then restarting this program again so that it thinks it's already downloaded (did you?)"
+	echo "or you could just wait a few hours of your precious time here.."
 	wget http://vision.is.tohoku.ac.jp/chictopia2/photos.lmdb.tar
 	tar xf photos.lmdb.tar
 	if [ -d "./photos.lmdb" ]
