@@ -64,9 +64,11 @@ def processimage():
 @click.option('-p', '--img-path', callback=validators.check_if_image_exists_in_dataset, help='Only the image filename, like \'01234.jpg\'. It must be in the dataset\'s images folder')
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in all the dataset')
+@click.option('-b', '--begin-from', default=0, help='If \'all-set\', you can select from which image in the annotations\' index to begin by putting the number here')
+@click.option('-o', '--original', is_flag=True, default=False, help='Use the original annotations, not fixed.')
 @click.option('-c', '--coco-way', is_flag=True, default=False, help='Use the coco api to see the masks annotations. Do not use if you want to see bboxes')
 @click.pass_context
-def viewimage(ctx, img_path, segments, all_set, coco_way):
+def viewimage(ctx, img_path, segments, all_set, coco_way, original,begin_from):
 	''' View and (not yet needed) save dataset images, plain (not yet needed) or annotated. Useful to check the dataset annotations on the dataset and compare them with the prediction!
 		Runs without GPU need '''
 	if not coco_way:
@@ -75,20 +77,21 @@ def viewimage(ctx, img_path, segments, all_set, coco_way):
 		from maskrcnn_modanet.viewimagescoco import viewImages
 
 	if (not segments or (segments and not all_set) ) and ((1 if img_path else 0)+(1 if all_set else 0)) == 1:
-		viewImages(img_path, segments, all_set)
+		viewImages(img_path, segments, all_set, original=original,begin_from=begin_from)
 	else:
 		print_help(ctx, None,  value=True)
 
 
 @main.command()
 @click.option('-p', '--img-path', callback=validators.check_if_image_exists_in_dataset, help='Only the image filename, like \'01234.jpg\'. It must be in the dataset\'s images folder')
+@click.option('-o', '--original', is_flag=True, default=False, help='Use the original annotations, not fixed.')
 @click.pass_context
-def viewannotation(ctx, img_path):
+def viewannotation(ctx, img_path, original):
 	''' View and (not yet needed) save dataset images, plain (not yet needed) or annotated. Useful to check the dataset annotations on the dataset and compare them with the prediction!
 		Runs without GPU need '''
 	from maskrcnn_modanet.viewannotations import viewAnnotations
 	if img_path:
-		print(viewAnnotations(img_path))
+		print(viewAnnotations(img_path, original))
 	else:
 		print_help(ctx, None,  value=True)
 
@@ -131,6 +134,8 @@ def download(path):
 	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json', 'w') as outfile:
 		json.dump(savedvars, outfile)
 
+	print('\n\nNow run \'maskrcnn-modanet datasets arrange\'\n\n')
+
 
 @datasets.command()
 def arrange():
@@ -139,6 +144,20 @@ def arrange():
 	'''
 	from .. import arrange_images
 	from .. import arrange_annotations
+
+@datasets.command()
+def fix():
+	''' Fixes the annotations' errors.
+	
+		ModaNet annotations have some bounding boxes not aligned with the mask,
+		particularly so with footwear and boots, where both feet have the same
+		bounding box x1 and y1 (position of upper-left corner of box),
+		but the correct shape (x2, y2 are the width and height)
+
+		You can always revert back by deleting instances_all.json and arranging
+		the dataset again.
+	'''
+	from maskrcnn_modanet import fix_annotations
 
 @savedvars.command()
 def show():

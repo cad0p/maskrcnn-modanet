@@ -23,7 +23,7 @@ if not os.path.isfile(ann_path + 'instances_all.json'):
 	with open(ann_path + 'instances_all.json', 'w') as outfile:
 		json.dump(instances, outfile)
 
-print('Now arranging annotations')
+print('Now arranging annotations. Just delete the file \'instances_all.json\' and rerun this command, if you want to restore it to the original one.')
 print()
 
 # now asking variables, if not already saved
@@ -151,3 +151,7 @@ with open(ann_path + 'instances_val.json', 'w') as outfile:
 
 with open(ann_path + 'instances_test.json', 'w') as outfile:
 	json.dump(test_ann, outfile)
+
+print('\nNow you can train using: maskrcnn-modanet train')
+
+print('\nOr you can fix the dataset using: maskrcnn-modanet datasets fix')
