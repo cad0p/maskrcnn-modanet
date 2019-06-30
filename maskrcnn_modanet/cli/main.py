@@ -62,13 +62,14 @@ def processimage():
 
 @main.command()
 @click.option('-p', '--img-path', callback=validators.check_if_image_exists_in_dataset, help='Only the image filename, like \'01234.jpg\'. It must be in the dataset\'s images folder')
+@click.option('-m', '--anns-path', default=None, callback=validators.check_if_file_exists, help='The path to the custom annotations file you want to use (m letter is used for similarity to the --model-path)')
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in all the dataset')
 @click.option('-b', '--begin-from', default=0, help='If \'all-set\', you can select from which image in the annotations\' index to begin by putting the number here')
 @click.option('-o', '--original', is_flag=True, default=False, help='Use the original annotations, not fixed.')
 @click.option('-c', '--coco-way', is_flag=True, default=False, help='Use the coco api to see the masks annotations. Do not use if you want to see bboxes')
 @click.pass_context
-def viewimage(ctx, img_path, segments, all_set, coco_way, original,begin_from):
+def viewimage(ctx, img_path, segments, all_set, coco_way, original,begin_from, anns_path):
 	''' View and (not yet needed) save dataset images, plain (not yet needed) or annotated. Useful to check the dataset annotations on the dataset and compare them with the prediction!
 		Runs without GPU need '''
 	if not coco_way:
@@ -77,21 +78,22 @@ def viewimage(ctx, img_path, segments, all_set, coco_way, original,begin_from):
 		from maskrcnn_modanet.viewimagescoco import viewImages
 
 	if (not segments or (segments and not all_set) ) and ((1 if img_path else 0)+(1 if all_set else 0)) == 1:
-		viewImages(img_path, segments, all_set, original=original,begin_from=begin_from)
+		viewImages(img_path, segments, all_set, original=original,begin_from=begin_from,anns_path=anns_path)
 	else:
 		print_help(ctx, None,  value=True)
 
 
 @main.command()
 @click.option('-p', '--img-path', callback=validators.check_if_image_exists_in_dataset, help='Only the image filename, like \'01234.jpg\'. It must be in the dataset\'s images folder')
+@click.option('-m', '--anns-path', default=None, callback=validators.check_if_file_exists, help='The path to the custom annotations file you want to use (m letter is used for similarity to the --model-path)')
 @click.option('-o', '--original', is_flag=True, default=False, help='Use the original annotations, not fixed.')
 @click.pass_context
-def viewannotation(ctx, img_path, original):
+def viewannotation(ctx, img_path, original, anns_path):
 	''' View and (not yet needed) save dataset images, plain (not yet needed) or annotated. Useful to check the dataset annotations on the dataset and compare them with the prediction!
 		Runs without GPU need '''
 	from maskrcnn_modanet.viewannotations import viewAnnotations
 	if img_path:
-		print(viewAnnotations(img_path, original))
+		print(viewAnnotations(img_path, original, anns_path=anns_path))
 	else:
 		print_help(ctx, None,  value=True)
 

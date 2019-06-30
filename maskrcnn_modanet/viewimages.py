@@ -1,7 +1,7 @@
 
 
 
-def viewImages(img_path, segments, all_set, save_path=None, limit=None, original=False, begin_from=0):
+def viewImages(img_path, segments, all_set, save_path=None, limit=None, original=False, begin_from=0, anns_path=None):
 
 	score = 1
 
@@ -33,6 +33,9 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None, original
 	# load annotations
 	if original:
 		with open(ann_orig_path + 'modanet2018_instances_train.json') as f:
+			instances = json.load(f)
+	elif anns_path:
+		with open(anns_path) as f:
 			instances = json.load(f)
 	else:
 		with open(ann_path + 'instances_all.json') as f:
@@ -75,6 +78,13 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None, original
 	# if img_path, ask again at the end to save time if you want to see multiple files quickly.
 
 	while True:
+
+		if original:
+			title = (ann_orig_path + 'modanet2018_instances_train.json')
+		elif anns_path:
+			title = (anns_path)
+		else:
+			title = (ann_path + 'instances_all.json')
 
 		if all_set:
 			# load images
@@ -176,7 +186,7 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None, original
 					segment_id += 1
 							
 				if not segments:    
-					plt.figure(figsize=(15, 15))
+					plt.figure(figsize=(7, 7), num=title)
 					plt.axis('off')
 					plt.imshow(draw)
 					if not save_path:

@@ -103,7 +103,7 @@ class MyCOCO(COCO):
 				print(ann['caption'])
 
 
-def viewImages(img_path, segments, all_set, save_path=None, limit=None, original=False, begin_from=0):
+def viewImages(img_path, segments, all_set, save_path=None, limit=None, original=False, begin_from=0, anns_path=None):
 
 	score = 1
 	limit = 100
@@ -140,9 +140,15 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None, original
 	if original:
 		with open(ann_orig_path + 'modanet2018_instances_train.json') as f:
 			instances = json.load(f)
+		plt.title(ann_orig_path + 'modanet2018_instances_train.json')
+	elif anns_path:
+		with open(anns_path) as f:
+			instances = json.load(f)
+		plt.title(anns_path)
 	else:
 		with open(ann_path + 'instances_all.json') as f:
 			instances = json.load(f)
+		plt.title(ann_path + 'instances_all.json')
 
 
 	images_ids = {
@@ -181,6 +187,13 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None, original
 	# if img_path, ask again at the end to save time if you want to see multiple files quickly.
 
 	while True:
+
+		if original:
+			plt.title(ann_orig_path + 'modanet2018_instances_train.json')
+		elif anns_path:
+			plt.title(anns_path)
+		else:
+			plt.title(ann_path + 'instances_all.json')
 
 		if all_set:
 			# load images
@@ -231,6 +244,7 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None, original
 
 				plt.imshow(draw); plt.axis('on')
 				coco.showAnns(images_anns[img_id])
+				plt.figure(num=img['file_name'])
 				plt.show()
 
 				segment_id = 0

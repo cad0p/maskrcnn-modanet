@@ -1,7 +1,7 @@
 
 
 
-def viewAnnotations(img_path, original=False):
+def viewAnnotations(img_path, original=False, anns_path=None):
 
 	import json
 	import os
@@ -19,6 +19,9 @@ def viewAnnotations(img_path, original=False):
 	# load annotations
 	if original:
 		with open(ann_orig_path + 'modanet2018_instances_train.json') as f:
+			instances = json.load(f)
+	elif anns_path:
+		with open(anns_path) as f:
 			instances = json.load(f)
 	else:
 		with open(ann_path + 'instances_all.json') as f:

@@ -666,6 +666,8 @@ logs['invalid_boxes'] = []
 # i added categories here
 images_anns_indexes = [ [ [] for j in range(14) ] for i in range(1115985) ]
 
+counter_shapes_corrected_double = 0
+
 for ann_index, ann in enumerate(instances['annotations']):
 		img_id = ann['image_id']
 		label = ann['category_id']
@@ -682,6 +684,7 @@ for img_id in img_ids:
 			bbox1 = ann1['bbox']
 			mask1 = ann1['segmentation']
 			id1 = ann1['segmentation']
+			label1 = ann['category_id']
 
 			if bbox1 == [400, 600, 0, 0]:
 				logs['invalid_boxes'].append({
@@ -693,28 +696,67 @@ for img_id in img_ids:
 					'file_name': instances['images'][images_index[img_id]]['file_name']
 				})
 
+			counter_lonely = 0
+
 			for shape_index1, shape1 in enumerate(mask1):
 				if not bboxContainsShape(bbox1, shape1) and len(mask1) > 1:
 					lonely = True
 					# want to find if a shape is lonely
 					for ann_index2 in images_anns_indexes[img_id][label]:
 						ann2 = instances['annotations'][ann_index2]
-						bbox2 = ann1['bbox']
-						mask2 = ann1['segmentation']
+						bbox2 = ann2['bbox']
+						mask2 = ann2['segmentation']
 
 						if ann_index1 != ann_index2 and bboxContainsShape(bbox2, shape1):
 							lonely = False
-							# moving the shape to the correct bbox
-							instances['annotations'][ann_index2]['segmentation'].append(shape1)
+							# moving the shape to the correct bbox (if not already present) and deleting it from here
+							if shape1 not in instances['annotations'][ann_index2]['segmentation']:
+								instances['annotations'][ann_index2]['segmentation'].append(shape1)
+							else:
+								counter_shapes_corrected_double += 1
 							del instances['annotations'][ann_index1]['segmentation'][shape_index1]
 							break
 					if lonely:
 						mask_new.append(shape1)
+						counter_lonely += 1
+
+			if counter_lonely == len(instances['annotations'][ann_index1]['segmentation']):
+				# all shapes are lonely, so delete them from the new mask
+				# and fit the old box to the mask
+				for lonely_i in range(counter_lonely):
+					mask_new.pop()
+
+				shape_bbox = maskBbox(instances['annotations'][ann_index1]['segmentation'])
+
+				logs['move_box'].append({
+							'label': label1,
+							'bbox1': bbox1,
+							'bbox2': None,
+							'shapes_box': shape_bbox,
+							'file_name': instances['images'][images_index[img_id]]['file_name'],
+							'wrong': 0
+						})
+
+		
+				instances['annotations'][ann_index1]['bbox'][0] = shape_bbox[0]
+				instances['annotations'][ann_index1]['bbox'][1] = shape_bbox[1]
+			else:
+				# the shapes that are lonely must be deleted from the ann1
+				reversed_shape_index_new = 0
+				for shape_new in reversed(mask_new):
+					if reversed_shape_index_new == counter_lonely:
+						break
+					for shape_index1, shape1 in enumerate(instances['annotations'][ann_index1]['segmentation']):
+						if shape1 == shape_new:
+							del instances['annotations'][ann_index1]['segmentation'][shape_index1]
+					reversed_shape_index_new += 1
+
+
 		
 		if mask_new != []:
 			bbox_new = maskBbox(mask_new)
 			area_new = bbox_new[2] * bbox_new[3]
-			id_new = 1000*area_new/(bbox_new[0]+1)
+			id_new = len(instances['annotations'])
 			instances['annotations'].append({
 					'iscrowd':0,
 					'category_id':label,
@@ -726,6 +768,7 @@ for img_id in img_ids:
 			})
 
 
+print(str(counter_shapes_corrected_double) + ' shapes that were wrongly readded (duplicates) in previous attempts')
 
 
 print("Now writing logs in datasets/fix_logs folder..")
