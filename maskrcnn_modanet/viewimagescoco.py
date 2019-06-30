@@ -140,15 +140,16 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None, original
 	if original:
 		with open(ann_orig_path + 'modanet2018_instances_train.json') as f:
 			instances = json.load(f)
-		plt.title(ann_orig_path + 'modanet2018_instances_train.json')
+		title = ann_orig_path + 'modanet2018_instances_train.json'
 	elif anns_path:
 		with open(anns_path) as f:
 			instances = json.load(f)
-		plt.title(anns_path)
+		title = anns_path
 	else:
 		with open(ann_path + 'instances_all.json') as f:
 			instances = json.load(f)
-		plt.title(ann_path + 'instances_all.json')
+		title = ann_path + 'instances_all.json'
+	titleshort = title.split("/")[-1]
 
 
 	images_ids = {
@@ -187,13 +188,6 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None, original
 	# if img_path, ask again at the end to save time if you want to see multiple files quickly.
 
 	while True:
-
-		if original:
-			plt.title(ann_orig_path + 'modanet2018_instances_train.json')
-		elif anns_path:
-			plt.title(anns_path)
-		else:
-			plt.title(ann_path + 'instances_all.json')
 
 		if all_set:
 			# load images
@@ -242,9 +236,11 @@ def viewImages(img_path, segments, all_set, save_path=None, limit=None, original
 
 				img_id = img['id']
 
-				plt.imshow(draw); plt.axis('on')
+				plt.figure(num=img['file_name'] + ' – ' + titleshort)
+
+				plt.imshow(draw); plt.axis('off'); plt.tight_layout()
 				coco.showAnns(images_anns[img_id])
-				plt.figure(num=img['file_name'])
+
 				plt.show()
 
 				segment_id = 0
