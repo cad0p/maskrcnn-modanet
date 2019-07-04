@@ -18,10 +18,10 @@ def ShapeIsNearerToFirstMask(shape, mask1, mask2):
 				shape_bbox1[xy_index1 % 2] = xy1
 			elif xy1 - shape_bbox1[xy_index1 % 2] > shape_bbox1[xy_index1 % 2 + 2]:
 				shape_bbox1[xy_index1 % 2 + 2] = xy1 - shape_bbox1[xy_index1 % 2]
-		distancemask1.append(min(shape_bbox[0] - (shape_bbox1[0] + shape_bbox1[2]),
-								shape_bbox[1] - (shape_bbox1[1] + shape_bbox1[3]),
-								shape_bbox[0] + shape_bbox[2] - shape_bbox1[0],
-								shape_bbox[1] + shape_bbox1[3] - shape_bbox1[1]
+		distancemask1.append(min(abs(shape_bbox[0] - shape_bbox1[0]),
+								abs(shape_bbox[1] - shape_bbox1[1]),
+								abs(shape_bbox[0] + shape_bbox[2] - shape_bbox1[0] - shape_bbox1[2]),
+								abs(shape_bbox[1] + shape_bbox[3] - shape_bbox1[1] - shape_bbox1[3])
 								))
 
 	for shape2 in mask2:
@@ -31,10 +31,10 @@ def ShapeIsNearerToFirstMask(shape, mask1, mask2):
 				shape_bbox2[xy_index2 % 2] = xy2
 			elif xy2 - shape_bbox2[xy_index2 % 2] > shape_bbox2[xy_index2 % 2 + 2]:
 				shape_bbox2[xy_index2 % 2 + 2] = xy2 - shape_bbox2[xy_index2 % 2]
-		distancemask2.append(min(shape_bbox[0] - (shape_bbox2[0] + shape_bbox2[2]),
-								shape_bbox[1] - (shape_bbox2[1] + shape_bbox2[3]),
-								shape_bbox[0] + shape_bbox[2] - shape_bbox2[0],
-								shape_bbox[1] + shape_bbox1[3] - shape_bbox2[1]
+		distancemask2.append(min(abs(shape_bbox[0] - shape_bbox2[0]),
+								abs(shape_bbox[1] - shape_bbox2[1]),
+								abs(shape_bbox[0] + shape_bbox[2] - shape_bbox2[0] - shape_bbox2[2]),
+								abs(shape_bbox[1] + shape_bbox[3] - shape_bbox2[1] - shape_bbox2[3])
 								))
 	return mean(distancemask1) <= mean(distancemask2)
 
@@ -49,18 +49,18 @@ def ShapeIsNearerToFirstBbox(shape, bbox1, bbox2):
 			shape_bbox[xy_index % 2 + 2] = xy - shape_bbox[xy_index % 2]
 
 
-	distancebbox1 = (min(shape_bbox[0] - (bbox1[0] + bbox1[2]),
-							shape_bbox[1] - (bbox1[1] + bbox1[3]),
-							shape_bbox[0] + shape_bbox[2] - bbox1[0],
-							shape_bbox[1] + bbox1[3] - bbox1[1]
-							))
+	distancebbox1 = min(abs(shape_bbox[0] - bbox1[0]),
+							abs(shape_bbox[1] - bbox1[1]),
+							abs(shape_bbox[0] + shape_bbox[2] - bbox1[0] - bbox1[2]),
+							abs(shape_bbox[1] + shape_bbox[3] - bbox1[1] - bbox1[3])
+							)
 
 
-	distancebbox2 = (min(shape_bbox[0] - (bbox2[0] + bbox2[2]),
-							shape_bbox[1] - (bbox2[1] + bbox2[3]),
-							shape_bbox[0] + shape_bbox[2] - bbox2[0],
-							shape_bbox[1] + bbox1[3] - bbox2[1]
-							))
+	distancebbox2 = min(abs(shape_bbox[0] - bbox2[0]),
+							abs(shape_bbox[1] - bbox2[1]),
+							abs(shape_bbox[0] + shape_bbox[2] - bbox2[0] - bbox2[2]),
+							abs(shape_bbox[1] + shape_bbox[3] - bbox2[1] - bbox2[3])
+							)
 	return distancebbox1 <= distancebbox2
 
 
@@ -76,8 +76,6 @@ def maskBbox(shapes):
 			shape_bbox[2] = shape_bbox_i[2]
 		if shape_bbox_i[3] > shape_bbox[3]:
 			shape_bbox[3] = shape_bbox_i[3]
-	if shape_bbox == [400, 600, 0, 0]:
-		import ipdb; ipdb.set_trace()
 	return shape_bbox
 
 
@@ -91,17 +89,21 @@ def shapeBbox(shape):
 	return shape_bbox
 
 
-def bboxShapeMargin(bbox, shape):
+def bboxShapeMargin(bbox, shape, translate=False):
 	shape_bbox = [400, 600, 0, 0]
 	for xy_index, xy in enumerate(shape):	
 		if xy < shape_bbox[xy_index % 2]:
 			shape_bbox[xy_index % 2] = xy
 		elif xy - shape_bbox[xy_index % 2] > shape_bbox[xy_index % 2 + 2]:
 			shape_bbox[xy_index % 2 + 2] = xy - shape_bbox[xy_index % 2]
-	return (shape_bbox[0] - bbox[0] + 
-			shape_bbox[1] - bbox[1] + 
-			bbox[2] - shape_bbox[2] +
-			bbox[3] - shape_bbox[3]
+	if translate:
+		# this way we only consider width and height
+		shape_bbox[0] = bbox[0]
+		shape_bbox[1] = bbox[1]
+	return (abs(shape_bbox[0] - bbox[0]) + 
+			abs(shape_bbox[1] - bbox[1]) + 
+			abs(bbox[2] - shape_bbox[2]) +
+			abs(bbox[3] - shape_bbox[3])
 			)
 
 def bboxContainsShapes(bbox, shapes, error=0.05):
@@ -125,8 +127,8 @@ def bboxContainsShape(bbox, shape, error=0.05):
 
 	return (bbox[0] - error * shape_bbox[2] <= shape_bbox[0] and
 			bbox[1] - error * shape_bbox[3] <= shape_bbox[1] and
-			bbox[2] + error * shape_bbox[2] >= shape_bbox[2] and
-			bbox[3] + error * shape_bbox[3] >= shape_bbox[3]
+			bbox[0] + bbox[2] + error * shape_bbox[2] >= shape_bbox[0] + shape_bbox[2] and
+			bbox[1] + bbox[3] + error * shape_bbox[3] >= shape_bbox[1] + shape_bbox[3]
 			)
 
 import json
@@ -403,6 +405,30 @@ for img_id in img_ids:
 							elif bboxContainsShape(bbox1, shape1) and not bboxContainsShape(bbox2, shape2):
 								wrongbbox2 = True
 
+							elif not bboxContainsShape(bbox1, shape1) and not bboxContainsShape(bbox2, shape1):
+								# which one should we move?
+								# we should move the one with width and height more similar to the shape
+
+								if (bboxShapeMargin(bbox1, shape1, translate=True) <=
+									bboxShapeMargin(bbox2, shape1, translate=True)):
+									# this means bbox1 is more fit to his shape: let's keep it and move the box1
+									wrongbbox1 = True
+
+								elif (shapeBbox(shape1)[2] * shapeBbox(shape1)[3] > 1000 and 
+									len(instances['annotations'][ann_index1]['segmentation']) > 1):
+									
+									# this is to avoid moving very small shapes
+									wrongbbox2 = True
+									# the bbox2 is more fit. let's move the shape1 to bbox2! (and then fit the box)
+									if shape1 not in instances['annotations'][ann_index2]['segmentation']:
+										instances['annotations'][ann_index2]['segmentation'].append(shape1)
+
+									del instances['annotations'][ann_index1]['segmentation'][shape_index1]
+									shape_index1 -= 1
+									# shape1 is done for check next shape1
+									break
+
+
 							# if not bboxContainsShape(bbox1, shape1) and bboxContainsShape(bbox2, shape1):
 							# 	# put shape1 into bbox2
 							# 	if len(instances['annotations'][ann_index1]['segmentation']) > 1:
@@ -667,6 +693,7 @@ logs['invalid_boxes'] = []
 images_anns_indexes = [ [ [] for j in range(14) ] for i in range(1115985) ]
 
 counter_shapes_corrected_double = 0
+counter_shapes_moved = 0
 
 for ann_index, ann in enumerate(instances['annotations']):
 		img_id = ann['image_id']
@@ -712,6 +739,7 @@ for img_id in img_ids:
 							# moving the shape to the correct bbox (if not already present) and deleting it from here
 							if shape1 not in instances['annotations'][ann_index2]['segmentation']:
 								instances['annotations'][ann_index2]['segmentation'].append(shape1)
+								counter_shapes_moved += 1
 							else:
 								counter_shapes_corrected_double += 1
 							del instances['annotations'][ann_index1]['segmentation'][shape_index1]
@@ -768,7 +796,11 @@ for img_id in img_ids:
 			})
 
 
-print(str(counter_shapes_corrected_double) + ' shapes that were wrongly readded (duplicates) in previous attempts')
+print(str(counter_shapes_corrected_double) + ' shapes that were wrongly readded (duplicates) in previous attempts, rest: ' + str(counter_shapes_moved))
+
+print("Now exchanging boxes that were incorrectly moved to the wrong position")
+
+# check the margins and correct if one is more fit than another one, correct them
 
 
 print("Now writing logs in datasets/fix_logs folder..")
