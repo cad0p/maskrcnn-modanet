@@ -1,7 +1,7 @@
 import click, json, os
 
 from . import validators
-from maskrcnn_modanet import processimages
+
 
 
 def print_help(ctx, param, value):
@@ -108,6 +108,17 @@ def evaluate(ctx, model_path):
 	else:
 		print_help(ctx, None,  value=True)
 
+
+@main.command()
+@click.option('-p', '--profile', default=None, help='The instagram profile username you want the statistics on.')
+@click.pass_context
+def instagram(ctx, profile):
+	''' Simple implementation to track instagram metrics per profile. '''
+	from maskrcnn_modanet.instagram_impl import instagramImpl
+	if profile:
+		instagramImpl(profile)
+	else:
+		print_help(ctx, None,  value=True)
 
 @datasets.command()
 @click.argument('path', callback=validators.check_if_folder_exists)
@@ -219,6 +230,7 @@ def save():
 @click.pass_context
 def image(ctx, proc_img_path, proc_img_url, segments, all_set, model_path, threshold_score):
 	''' Show processed image '''
+	from maskrcnn_modanet import processimages
 	
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
 		processimages.main(proc_img_path, proc_img_url, all_set, None, model_path, segments, False, threshold_score)
@@ -233,6 +245,7 @@ def image(ctx, proc_img_path, proc_img_url, segments, all_set, model_path, thres
 @click.pass_context
 def annotations(ctx, proc_img_path, proc_img_url, model_path, threshold_score):
 	''' Show processed image annotations '''
+	from maskrcnn_modanet import processimages
 	segments = True; all_set = False
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
 		print(processimages.main(proc_img_path, proc_img_url, False, None, model_path, segments, True, threshold_score)) #function returns the annotations
@@ -252,6 +265,8 @@ def annotations(ctx, proc_img_path, proc_img_url, model_path, threshold_score):
 @click.pass_context
 def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_path, threshold_score, limit):
 	''' Save processed image '''
+	from maskrcnn_modanet import processimages
+
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
 		processimages.main(proc_img_path, proc_img_url, all_set, save_path, model_path, segments, False, threshold_score, limit)
 	else:
@@ -266,6 +281,8 @@ def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_
 @click.pass_context
 def annotations(ctx, proc_img_path, proc_img_url, save_path, model_path, threshold_score):
 	''' Save processed image annotations '''
+	from maskrcnn_modanet import processimages
+
 	segments = True; all_set = False
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
 		processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, segments, True, threshold_score)
