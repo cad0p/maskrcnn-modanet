@@ -27,7 +27,7 @@ Then you can explore its features and commands by running `maskrcnn-modanet`
 
 Install Python and Keras
 
-Install Git LFS (Large File Storage) to get all the files!
+Install [Git LFS (Large File Storage)](https://github.com/git-lfs/git-lfs/wiki/Installation) to get all the files!
 
 <!--## Files used
 
