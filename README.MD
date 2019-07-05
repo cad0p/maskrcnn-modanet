@@ -27,6 +27,8 @@ Then you can explore its features and commands by running `maskrcnn-modanet`
 
 Install Python and Keras
 
+Install Git LFS (Large File Storage) to get all the files!
+
 <!--## Files used
 
 * teslasheet [on my Drive](https://docs.google.com/spreadsheets/d/1wCQQs4Db_8AbxcvRWW3v0yB4pYNEC7v6ckFMnnmIEE4/edit?usp=sharing) - created with [SourceFiles](SourceFiles) taken from [Tesla Motors Club Forum](https://teslamotorsclub.com/tmc/threads/breaking-down-the-model-s-range-calculator-hidden-features-and-data.94675/#post-2692441)-->
