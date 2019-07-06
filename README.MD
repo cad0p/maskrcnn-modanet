@@ -41,6 +41,8 @@ Commands:
 
 
 ```
+I'll be very happy to merge your pull requests that add new implementations, or link to them in a section here!
+
 ## Getting Started
 
 This project is written in Python 3, so it works in all major OSes. Although only Linux and MacOS are fully supported.
