@@ -43,6 +43,14 @@ Commands:
 ```
 I'll be very happy to merge your pull requests that add new implementations, or link to them in a section here!
 
+Regarding the Instagram analyzer, I started from the [Instaloader](https://github.com/instaloader) classes and overrode some methods to get the urls of the posts instead of downloading them.
+
+It then runs through the COCO model to determine the images that have only one person that is bigger than 10% of the image, and on those images I run the ModaNet model to show some statistics about what type of apparel the user is wearing and even display the instances of them, if you request it.
+
+Say you want to quickly find what skirt (or footwear) your instagram star always wears. With this tool you can! And you can also see how often the instagram user shows himself alone in their images, and what he/she usually shares of him (always pictures with shoes? always only the top part?)
+
+
+
 ## Getting Started
 
 This project is written in Python 3, so it works in all major OSes. Although only Linux and MacOS are fully supported.
