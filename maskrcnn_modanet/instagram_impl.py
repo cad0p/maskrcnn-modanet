@@ -352,12 +352,6 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
                BadCredentialsException)
 	
 
-	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
-		savedvars = json.load(f)
-	path = savedvars['datapath']
-
-	snp_path = path + "results/snapshots"
-
 	if not restore_result:
 
 		instaloader = InstaloaderURL(dirname_pattern=path+'/results/instagram/{target}',download_pictures=True, download_videos=False, download_video_thumbnails=False,
@@ -504,6 +498,8 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 
 
 	elif restore_result:
+		log_file = open(log_path, 'w+')
+		
 		print('Restoring results..')
 		with open(profile_path + 'results.json') as f:
 			results = json.load(f)

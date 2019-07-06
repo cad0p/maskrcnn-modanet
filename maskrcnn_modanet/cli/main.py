@@ -144,17 +144,32 @@ def download(path):
 	dir_pkg_path = "/".join(dir_cli_path.split("/")[:-1]) + "/"
 	print(dir_pkg_path)
 
+	slow_download = input('Do you want to download the whole 1 million images (what I had to do) or to just download the 50k annotated with ModaNet?\nY for 1 million (40 GB), N for 50k: ')
+
+	if slow_download in ['y', 'Y']:
+		slow_download = True
+	else:
+		slow_download = False
+
+	fast_download = not slow_download
+
 	print('''downloading paperdoll dataset
 			taken from here:
 			https://github.com/kyamagu/paperdoll/tree/master/data/chictopia
 			''')
 
-	os.system("sh " + dir_pkg_path + "download.sh '" + path + "'")
+	failure = os.system("sh " + dir_pkg_path + "download.sh '" + path + "' " + str(1) if fast_download else str(0))
+
+	if failure:
+		print('Bash script failed. Run again this command after having downloaded the necessary packages')
+		exit()
+
 	
 	print("If you don't have tree installed, just install it for bash terminal and run this command again: \nmaskrcnn-modanet datasets download")	
 	print("\nThis command also stores your saved variables with the default values. run 'maskrcnn-modanet savedvars show' to see them")
 	savedvars = {
 		'savedvarspath': os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json',
+		'fast_download': str(fast_download),
 		'datapath': path,
 		'pkgpath': dir_pkg_path,
 		'seed' : None,
@@ -230,30 +245,34 @@ def save():
 @click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
+@click.option('-mt', '--model-type', default='default', callback=validators.check_if_model_type_valid, help='Set \'trained\' for your last trained snapshot on the snapshots folder, \'coco\' for the image recognition of the COCO dataset. \'default\' is the default value and is the pretrained modanet snapshot you downloaded in the results folder.')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
 @click.option('-t', '--threshold-score', default=0.5, callback=validators.check_if_score_is_valid, help='Set the lowest level of confidence to show annotations for the image')
 @click.pass_context
-def image(ctx, proc_img_path, proc_img_url, segments, all_set, model_path, threshold_score):
+def image(ctx, proc_img_path, proc_img_url, segments, all_set, model_path, threshold_score, model_type):
 	''' Show processed image '''
 	from maskrcnn_modanet import processimages
 	
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		processimages.main(proc_img_path, proc_img_url, all_set, None, model_path, segments, False, threshold_score)
+		model, labels_to_names = processimages.loadModel(model_type=model_type, model_path=model_path)
+		processimages.main(proc_img_path, proc_img_url, all_set, None, model_path, segments, False, threshold_score, model=model, labels_to_names=labels_to_names)
 	else:
 		print_help(ctx, None,  value=True)
 
 @view.command()
 @click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
 @click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
+@click.option('-mt', '--model-type', default='default', callback=validators.check_if_model_type_valid, help='Set \'trained\' for your last trained snapshot on the snapshots folder, \'coco\' for the image recognition of the COCO dataset. \'default\' is the default value and is the pretrained modanet snapshot you downloaded in the results folder.')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
 @click.option('-t', '--threshold-score', default=0.5, callback=validators.check_if_score_is_valid, help='Set the lowest level of confidence to show annotations for the image')
 @click.pass_context
-def annotations(ctx, proc_img_path, proc_img_url, model_path, threshold_score):
+def annotations(ctx, proc_img_path, proc_img_url, model_path, threshold_score, model_type):
 	''' Show processed image annotations '''
 	from maskrcnn_modanet import processimages
 	segments = True; all_set = False
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		print(processimages.main(proc_img_path, proc_img_url, False, None, model_path, segments, True, threshold_score)) #function returns the annotations
+		model, labels_to_names = processimages.loadModel(model_type=model_type, model_path=model_path)
+		print(processimages.main(proc_img_path, proc_img_url, False, None, model_path, segments, True, threshold_score, model=model, labels_to_names=labels_to_names)) #function returns the annotations
 	else:
 		print_help(ctx, None,  value=True)
 
@@ -264,32 +283,36 @@ def annotations(ctx, proc_img_path, proc_img_url, model_path, threshold_score):
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
 @click.option('-l', '--limit', default=None, type=int, help='Works with option -a. Only saves the first l number of results')
+@click.option('-mt', '--model-type', default='default', callback=validators.check_if_model_type_valid, help='Set \'trained\' for your last trained snapshot on the snapshots folder, \'coco\' for the image recognition of the COCO dataset. \'default\' is the default value and is the pretrained modanet snapshot you downloaded in the results folder.')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
 @click.option('-t', '--threshold-score', default=0.5, callback=validators.check_if_score_is_valid, help='Set the lowest level of confidence to show annotations for the image')
 @click.option('--save-path', default='default', callback=validators.check_if_file_folder_exists, help='Set your save path (including extension .jpg). Defaults inside the processimages folder')
 @click.pass_context
-def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_path, threshold_score, limit):
+def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_path, threshold_score, limit, model_type):
 	''' Save processed image '''
 	from maskrcnn_modanet import processimages
 
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		processimages.main(proc_img_path, proc_img_url, all_set, save_path, model_path, segments, False, threshold_score, limit)
+		model, labels_to_names = processimages.loadModel(model_type=model_type, model_path=model_path)
+		processimages.main(proc_img_path, proc_img_url, all_set, save_path, model_path, segments, False, threshold_score, limit, model=model, labels_to_names=labels_to_names)
 	else:
 		print_help(ctx, None,  value=True)
 
 @save.command()
 @click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
 @click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
+@click.option('-mt', '--model-type', default='default', callback=validators.check_if_model_type_valid, help='Set \'trained\' for your last trained snapshot on the snapshots folder, \'coco\' for the image recognition of the COCO dataset. \'default\' is the default value and is the pretrained modanet snapshot you downloaded in the results folder.')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
 @click.option('-t', '--threshold-score', default=0.5, callback=validators.check_if_score_is_valid, help='Set the lowest level of confidence to show annotations for the image')
 @click.option('--save-path', default='default', callback=validators.check_if_file_folder_exists, help='Set your save path (including extension .jpg). Defaults inside the processimages folder')
 @click.pass_context
-def annotations(ctx, proc_img_path, proc_img_url, save_path, model_path, threshold_score):
+def annotations(ctx, proc_img_path, proc_img_url, save_path, model_path, threshold_score, model_type):
 	''' Save processed image annotations '''
 	from maskrcnn_modanet import processimages
 
 	segments = True; all_set = False
 	if (not segments or (segments and not all_set) ) and ((1 if proc_img_path else 0)+(1 if proc_img_url else 0)+(1 if all_set else 0)) == 1:
-		processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, segments, True, threshold_score)
+		model, labels_to_names = processimages.loadModel(model_type=model_type, model_path=model_path)
+		processimages.main(proc_img_path, proc_img_url, False, save_path, model_path, segments, True, threshold_score, model=model, labels_to_names=labels_to_names)
 	else:
 		print_help(ctx, None,  value=True)

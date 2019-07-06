@@ -416,7 +416,7 @@ for img_id in img_ids:
 
 								elif (shapeBbox(shape1)[2] * shapeBbox(shape1)[3] > 1000 and 
 									len(instances['annotations'][ann_index1]['segmentation']) > 1):
-									
+	# THIS PART CAN CAUSE FAULTS i.e. MOVE SHAPES INCORRECTLY
 									# this is to avoid moving very small shapes
 									wrongbbox2 = True
 									# the bbox2 is more fit. let's move the shape1 to bbox2! (and then fit the box)

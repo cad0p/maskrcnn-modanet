@@ -154,8 +154,8 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 		# set the modified tf session as backend in keras
 		keras.backend.tensorflow_backend.set_session(get_session())
 
-	# adjust this to point to your trained model
-	if not model_path and not model:
+		# adjust this to point to your trained model
+	
 		# get all models names in the results folder
 		modelnames = [f for f in os.listdir(snp_path) if os.path.isfile(os.path.join(snp_path, f))]
 		import re
@@ -167,8 +167,8 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 		print(max(modelnames,key=extract_number))
 		model_path = os.path.join(snp_path, max(modelnames,key=extract_number))
 
-	# load retinanet model
-	if not model:
+		# load retinanet model
+	
 		model = models.load_model(model_path, backbone_name='resnet50')
 	if not labels_to_names:
 		# load label to names mapping for visualization purposes

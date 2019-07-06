@@ -81,5 +81,11 @@ def check_if_score_is_valid(ctx, param, value):
 def validate_offset(ctx, param, value):
 	''' Check if the offset is positive and lower it by 1 '''
 	if not (0 <= value):
-		raise BadParameter("The threshold score must be between 0 and 1.", ctx, param)
+		raise BadParameter("The offset must be positive.", ctx, param)
 	return value - 1 if value > 0 else value
+
+def check_if_model_type_valid(ctx, param, value):
+	''' Check if the value is either default, coco, or trained '''
+	if not value in ['default', 'coco', 'trained']:
+		raise BadParameter("The model_type must be either default, coco, or trained.", ctx, param)
+	return value

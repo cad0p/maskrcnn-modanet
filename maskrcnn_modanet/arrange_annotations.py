@@ -5,6 +5,8 @@ with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as 
 	savedvars = json.load(f)
 path = savedvars['datapath']
 
+fast_download = savedvars['fast_download'] == 'True'
+
 import copy
 
 import random
@@ -18,6 +20,7 @@ sets_names = ['train', 'val', 'test']
 
 if not os.path.isfile(ann_path + 'instances_all.json'):
 	# copy the modanet instances to the annotations folder
+	print('Copying annotations from the original path')
 	with open(ann_orig_path + 'modanet2018_instances_' + sets_names[0] + '.json') as f:
 		instances = json.load(f)
 	with open(ann_path + 'instances_all.json', 'w') as outfile:
@@ -155,3 +158,6 @@ with open(ann_path + 'instances_test.json', 'w') as outfile:
 print('\nNow you can train using: maskrcnn-modanet train')
 
 print('\nOr you can fix the dataset using: maskrcnn-modanet datasets fix')
+
+if fast_download:
+	print('Your dataset is already fixed anyway, since you fast-downloaded it.')
