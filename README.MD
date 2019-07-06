@@ -1,14 +1,49 @@
-A MaskRCNN Keras implementation with Modanet annotations on the Paperdoll dataset
+A Mask R-CNN Keras implementation with Modanet annotations on the Paperdoll dataset
 
-# MaskRCNN ModaNet
+# Mask R-CNN with ModaNet
 
 My bachelor's thesis project.
 
 ![ModaNet](https://github.com/eBay/modanet/blob/master/logo/modanet_logo2.png)
 
+To sum it all up, I created a program that enables you to quickly train any model using [fizyr's keras-maskrcnn](https://github.com/fizyr/keras-maskrcnn) (I spent around a month to make it work).
+And in particular to train it using [ModaNet](https://github.com/eBay/modanet).
+ModaNet, I discovered, had its flaws, particularly on the footwear and boots. They had the bounding boxes overlap with each other.
+You can check them out by running `maskrcnn-modanet viewimage --all-set --original`
+With and without the "original" parameter, in parallel in two different terminal tabs/windows.
+
+So I fixed them (although help is much appreciated to refine it).
+
+Then I ran some tests to check the results and footwear and boots recognition were dramatically improved.
+
+I then formulated a simple application to analyze how many shoes, or skirts, or one of the other 13 labels, are in the user's instagram account, only analyzing images in which there is only one person in the frame. More details again on the [release notes for v1.0](https://github.com/cad0p/maskrcnn-modanet/releases/tag/v1.0).
+
+Below is the home screen of the program.
+
+```
+Usage: maskrcnn-modanet [OPTIONS] COMMAND [ARGS]...
+
+  Main CLI.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  datasets        Manage your datasets run 1 -> maskrcnn-modanet datasets...
+  evaluate        Evaluate any trained model, average precision and recall.
+  instagram       Simple implementation to track instagram metrics per...
+  processimage    View and save processed image and annotations from input...
+  savedvars       Show and edit saved variables
+  train           Train using the dataset downloaded usage: maskrcnn-
+                  modanet...
+  viewannotation  View and (not yet needed) save dataset images, plain (not...
+  viewimage       View and (not yet needed) save dataset images, plain (not...
+
+
+```
 ## Getting Started
 
-This project is written in Python 3, so it works in all major OSes.
+This project is written in Python 3, so it works in all major OSes. Although only Linux and MacOS are fully supported.
 Keep in mind to use pip or pip3 depending on your settings.
 
 Clone this repo
@@ -20,6 +55,7 @@ Or go to the repo you just cloned on the terminal and run `pip install . -e --us
 Now that you've installed it, run `maskrcnn-modanet datasets download the/folder/you/want/to/put/data/in`
 
 It will take a while, about 40GB to download!
+EDIT: it is now reduced to just 2-3 GB. See the [release notes for v1.0](https://github.com/cad0p/maskrcnn-modanet/releases/tag/v1.0) for details on this and on the instagram application. 
 
 Then you can explore its features and commands by running `maskrcnn-modanet`
 
@@ -47,7 +83,7 @@ The following is a copy of PurpleBooth
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](../../tags). 
+For the versions available, see the [releases on this repository](../../releases). 
 
 ## Authors
 
