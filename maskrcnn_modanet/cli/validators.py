@@ -77,3 +77,9 @@ def check_if_score_is_valid(ctx, param, value):
 	if not (0 <= value <= 1):
 		raise BadParameter("The threshold score must be between 0 and 1.", ctx, param)
 	return value
+
+def validate_offset(ctx, param, value):
+	''' Check if the offset is positive and lower it by 1 '''
+	if not (0 <= value):
+		raise BadParameter("The threshold score must be between 0 and 1.", ctx, param)
+	return value - 1 if value > 0 else value

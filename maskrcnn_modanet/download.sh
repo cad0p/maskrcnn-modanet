@@ -1,5 +1,7 @@
 #!/bin/bash
 
+git lfs install
+
 cd
 mkdir .maskrcnn-modanet
 cd .maskrcnn-modanet
@@ -27,7 +29,7 @@ then
 	echo "putting the photos.lmdb file into ./datasets/paperdoll/data/chictopia"
 	echo "and then restarting this program again so that it thinks it's already downloaded (did you?)"
 	echo "or you could just wait a few hours of your precious time here.."
-	wget http://vision.is.tohoku.ac.jp/chictopia2/photos.lmdb.tar
+	wget -c http://vision.is.tohoku.ac.jp/chictopia2/photos.lmdb.tar
 	tar xf photos.lmdb.tar
 	if [ -d "./photos.lmdb" ]
 	then
@@ -39,6 +41,7 @@ then
 else echo "photos database already downloaded!"
 fi
 
+echo "unzipping database.."
 gunzip -c chictopia.sql.gz | sqlite3 chictopia.sqlite3
 if [ -f "./chictopia.sqlite3" ]
 then
@@ -73,6 +76,16 @@ cd .. #now in main folder
 mkdir results
 cd results
 pwd
+
+if [ ! -f "./resnet50_coco_v0.2.0.h5" ]
+then
+	echo "downloading the default coco snapshot"
+	wget -c https://github.com/fizyr/keras-maskrcnn/releases/download/0.2.2/resnet50_coco_v0.2.0.h5
+else echo "default coco snapshot already downloaded"
+fi
+
+# resnet50_modanet.h5
+
 mkdir snapshots
 mkdir processedimages
 mkdir logs

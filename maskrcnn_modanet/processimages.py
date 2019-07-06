@@ -10,6 +10,55 @@ ann_path = path + "datasets/coco/annotations/"
 snp_path = path + "results/snapshots"
 
 
+def loadModel(model_type='default', model_path=None):
+	from maskrcnn_modanet.processimages import get_session, apply_mask
+	import re
+	import os
+
+	# import keras
+	import keras
+
+	# set tf backend to allow memory to grow, instead of claiming everything
+	import tensorflow as tf
+
+	# use this environment flag to change which GPU to use
+	#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
+	# set the modified tf session as backend in keras
+	keras.backend.tensorflow_backend.set_session(get_session())
+
+	# load label to names mapping for visualization purposes
+	labels_to_names = {0: 'bag', 1: 'belt', 2: 'boots', 3: 'footwear', 4: 'outer', 5: 'dress', 6: 'sunglasses', 7: 'pants', 8: 'top', 9: 'shorts', 10: 'skirt', 11: 'headwear', 12: 'scarf/tie'}
+
+
+	# adjust this to point to your trained model
+	if model_type == 'trained':
+		# get all models names in the results folder
+		modelnames = [f for f in os.listdir(snp_path) if os.path.isfile(os.path.join(snp_path, f))]
+		
+		def extract_number(f):
+		    s = re.findall("\d+$",f)
+		    return (int(s[0]) if s else -1,f)
+		# get the model name with the highest epoch
+		print(max(modelnames,key=extract_number))
+		model_path = os.path.join(snp_path, max(modelnames,key=extract_number))
+	elif model_type == 'default' and not model_path:
+		model_path = path + 'results/resnet50_modanet.h5'
+	elif model_type == 'coco':
+		model_path = path + 'results/resnet50_coco_v0.2.0.h5'
+		labels_to_names = {0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorcycle', 4: 'airplane', 5: 'bus', 6: 'train', 7: 'truck', 8: 'boat', 9: 'traffic light', 10: 'fire hydrant', 11: 'stop sign', 12: 'parking meter', 13: 'bench', 14: 'bird', 15: 'cat', 16: 'dog', 17: 'horse', 18: 'sheep', 19: 'cow', 20: 'elephant', 21: 'bear', 22: 'zebra', 23: 'giraffe', 24: 'backpack', 25: 'umbrella', 26: 'handbag', 27: 'tie', 28: 'suitcase', 29: 'frisbee', 30: 'skis', 31: 'snowboard', 32: 'sports ball', 33: 'kite', 34: 'baseball bat', 35: 'baseball glove', 36: 'skateboard', 37: 'surfboard', 38: 'tennis racket', 39: 'bottle', 40: 'wine glass', 41: 'cup', 42: 'fork', 43: 'knife', 44: 'spoon', 45: 'bowl', 46: 'banana', 47: 'apple', 48: 'sandwich', 49: 'orange', 50: 'broccoli', 51: 'carrot', 52: 'hot dog', 53: 'pizza', 54: 'donut', 55: 'cake', 56: 'chair', 57: 'couch', 58: 'potted plant', 59: 'bed', 60: 'dining table', 61: 'toilet', 62: 'tv', 63: 'laptop', 64: 'mouse', 65: 'remote', 66: 'keyboard', 67: 'cell phone', 68: 'microwave', 69: 'oven', 70: 'toaster', 71: 'sink', 72: 'refrigerator', 73: 'book', 74: 'clock', 75: 'vase', 76: 'scissors', 77: 'teddy bear', 78: 'hair drier', 79: 'toothbrush'}
+	elif model_path:
+		pass
+	else:
+		print('The type must be either trained, coco, or default. Alternatively, you can put a custom model path')
+
+	# load retinanet model
+	from keras_maskrcnn import models
+	print(model_path)
+	model = models.load_model(model_path, backbone_name='resnet50')
+
+	return model, labels_to_names
+
 def get_session():
 	import tensorflow as tf
 
@@ -77,7 +126,8 @@ def draw_mask_only(image, box, mask, label=None, color=None, binarize_threshold=
 	indices = np.where(mask != color)
 	image[indices[0], indices[1], :] = 0 * image[indices[0], indices[1], :]
 
-def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None, segments=False, annotations=False, threshold_score=0.5, limit=None):
+def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, model_path=None, 
+		segments=False, annotations=False, threshold_score=0.5, limit=None, model=None, labels_to_names=None):
 	# import keras
 	import keras
 
@@ -100,11 +150,12 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 	# use this environment flag to change which GPU to use
 	#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
-	# set the modified tf session as backend in keras
-	keras.backend.tensorflow_backend.set_session(get_session())
+	if not model:
+		# set the modified tf session as backend in keras
+		keras.backend.tensorflow_backend.set_session(get_session())
 
 	# adjust this to point to your trained model
-	if not model_path:
+	if not model_path and not model:
 		# get all models names in the results folder
 		modelnames = [f for f in os.listdir(snp_path) if os.path.isfile(os.path.join(snp_path, f))]
 		import re
@@ -117,11 +168,11 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 		model_path = os.path.join(snp_path, max(modelnames,key=extract_number))
 
 	# load retinanet model
-	model = models.load_model(model_path, backbone_name='resnet50')
-	#print(model.summary())
-
-	# load label to names mapping for visualization purposes
-	labels_to_names = {0: 'bag', 1: 'belt', 2: 'boots', 3: 'footwear', 4: 'outer', 5: 'dress', 6: 'sunglasses', 7: 'pants', 8: 'top', 9: 'shorts', 10: 'skirt', 11: 'headwear', 12: 'scarf/tie'}
+	if not model:
+		model = models.load_model(model_path, backbone_name='resnet50')
+	if not labels_to_names:
+		# load label to names mapping for visualization purposes
+		labels_to_names = {0: 'bag', 1: 'belt', 2: 'boots', 3: 'footwear', 4: 'outer', 5: 'dress', 6: 'sunglasses', 7: 'pants', 8: 'top', 9: 'shorts', 10: 'skirt', 11: 'headwear', 12: 'scarf/tie'}
 
 	default_save_path = False
 	if save_path == 'default':
@@ -294,28 +345,33 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 		pass
 
 
-def apply_mask(model, image, threshold_score=0.5):
-	''' Process image numpy matrix using model and return the annotations '''
+def apply_mask(model, image, draw=None, threshold_score=0.5, labels_to_names=None, image_segments=True):
+	''' Process image numpy matrix using model and return the annotations
+		use draw if you want to draw over the image. the draw parameter is the image in RGB (image is in BGR instead) '''
 
 
 
 	from keras_retinanet.utils.image import preprocess_image, resize_image
 	from keras_retinanet.utils.colors import label_color
+	from keras_maskrcnn.utils.visualization import draw_mask
+	from keras_retinanet.utils.visualization import draw_box, draw_caption, draw_annotations
 
 	# import miscellaneous modules
 	import numpy as np
 	import time
 
+	if not labels_to_names:
+		# load label to names mapping for visualization purposes
+		labels_to_names = {0: 'bag', 1: 'belt', 2: 'boots', 3: 'footwear', 4: 'outer', 5: 'dress', 6: 'sunglasses', 7: 'pants', 8: 'top', 9: 'shorts', 10: 'skirt', 11: 'headwear', 12: 'scarf/tie'}
+	if not draw.any():
+		# copy to draw on
+		draw = image.copy()
 
-	# load label to names mapping for visualization purposes
-	labels_to_names = {0: 'bag', 1: 'belt', 2: 'boots', 3: 'footwear', 4: 'outer', 5: 'dress', 6: 'sunglasses', 7: 'pants', 8: 'top', 9: 'shorts', 10: 'skirt', 11: 'headwear', 12: 'scarf/tie'}
+		#switching to RGB from BGR
+		draw[:, :, 2] = image[:, :, 0]
+		draw[:, :, 0] = image[:, :, 2]
 
-	# copy to draw on
-	draw = image.copy()
-
-	#switching to RGB from BGR
-	draw[:, :, 2] = image[:, :, 0]
-	draw[:, :, 0] = image[:, :, 2]
+	draw_segment = draw.copy()
 
 	# preprocess image for network
 	image = preprocess_image(image)
@@ -338,7 +394,7 @@ def apply_mask(model, image, threshold_score=0.5):
 					'bbox': None,
 					'score': None,
 					'category': None,
-					'part' : None
+					'segment' : None
 	} for i in range(len([score for score in scores if score >= threshold_score]))]
 
 	i = 0
@@ -349,18 +405,27 @@ def apply_mask(model, image, threshold_score=0.5):
 		color = label_color(label)
 
 
-		drawclone = np.copy(draw)
+		drawclone = np.copy(draw_segment)
 
 		b = box.astype(int)
+		draw_box(draw, b, color=color)
 
 		mask = mask[:, :, label]
 		draw_mask_only(drawclone, b, mask, color=label_color(label))
+
 		
 
-		annotations[i]['bbox'] = b
+		draw_mask(draw, b, mask, color=label_color(label))
+
+		caption = "{} {:.3f}".format(labels_to_names[label], score)
+		draw_caption(draw, b, caption)
+		
+
+		annotations[i]['bbox'] = [b[0],b[1],b[2]-b[0],b[3]-b[1]]
 		annotations[i]['score'] = score
-		annotations[i]['category'] = label
-		annotations[i]['part'] = drawclone # only the object inside the mask is shown, the rest is black
+		annotations[i]['category'] = labels_to_names[label]
+		if image_segments:
+			annotations[i]['segment'] = drawclone # only the object inside the mask is shown, the rest is black
 		i += 1
 
 

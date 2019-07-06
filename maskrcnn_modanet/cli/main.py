@@ -111,12 +111,17 @@ def evaluate(ctx, model_path):
 
 @main.command()
 @click.option('-p', '--profile', default=None, help='The instagram profile username you want the statistics on.')
+@click.option('-r', '--restore-result', is_flag=True, default=False, help='Restore the last result in order not to process thousands of images multiple times when not needed.')
+@click.option('-l', '--limit', default=None, type=int, help='If an instagram profile is big and you want to use the most recent images only.')
+@click.option('-o', '--offset', default=0, type=int, callback=validators.validate_offset, 
+	help='If you want to view the images from a certain post. Counted from most recent. To use with limit option.')
+@click.option('-c', '--choice', default=None, help='Choose between \'i\' and \'s\'. i if you want to see the resulting images visually, s if you want to see the statistics. It will be asked to you during the program, otherwise.')
 @click.pass_context
-def instagram(ctx, profile):
+def instagram(ctx, profile, limit, offset, choice, restore_result):
 	''' Simple implementation to track instagram metrics per profile. '''
 	from maskrcnn_modanet.instagram_impl import instagramImpl
 	if profile:
-		instagramImpl(profile)
+		instagramImpl(profile, limit=limit, offset=offset, choice=choice, restore_result=restore_result)
 	else:
 		print_help(ctx, None,  value=True)
 
