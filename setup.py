@@ -28,8 +28,11 @@ setuptools.setup(
       'pandas',
       'sqlalchemy',
       'Cython',
+      'cython',
       'numpy',
       'pycocotools',
+      'matplotlib',
+      'tensorflow',
       'instaloader'
     ],
     entry_points = {
