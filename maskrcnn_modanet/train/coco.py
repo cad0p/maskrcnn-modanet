@@ -20,7 +20,7 @@ import os
 
 from pycocotools.coco import COCO
 
-from keras_maskrcnn.preprocessing.generator import Generator
+from maskrcnn_modanet.train.generator import Generator
 from keras_retinanet.utils.image import read_image_bgr
 
 
