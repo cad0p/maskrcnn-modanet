@@ -62,6 +62,8 @@ Run `pip install maskrcnn-modanet --user`
 
 Or go to the repo you just cloned on the terminal and run `pip install . -e --user`
 
+If you see any errors, just install the dependencies manually, just like this: `pip3 install --upgrade cython --user`
+
 Now that you've installed it, run `maskrcnn-modanet datasets download the/folder/you/want/to/put/data/in`
 
 It will take a while, about 40GB to download!
