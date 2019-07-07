@@ -20,7 +20,7 @@ cd $PATH1
 mkdir datasets
 cd datasets
 
-if [ ! $FAST ]
+if [ ! "$FAST" == "True" ]
 then
 	
 	# download images dataset
@@ -83,7 +83,7 @@ cd coco
 
 mkdir annotations
 
-if [ $FAST ]
+if [ "$FAST" == "True" ]
 then
 	pwd
 	echo "downloading the images folder.. (2 GB)"
@@ -107,12 +107,8 @@ then
 	pwd
 
 	echo "now downloading fixed ModaNet annotations (this can also be done with datasets fix command)"
-	if [ ! -f "./instances_all.json" ]
-	then
-		wget -c https://github.com/cad0p/maskrcnn-modanet/releases/download/v0.9/instances_all.json
-	else
-		echo "fixed ModaNet annotations already downloaded"
-	fi
+	wget -N https://github.com/cad0p/maskrcnn-modanet/releases/download/v0.9/instances_all.json
+	
 	cd ..
 	
 else
@@ -127,20 +123,12 @@ mkdir results
 cd results
 pwd
 
-if [ ! -f "./resnet50_coco_v0.2.0.h5" ]
-then
-	echo "downloading the default coco snapshot"
-	wget -c https://github.com/fizyr/keras-maskrcnn/releases/download/0.2.2/resnet50_coco_v0.2.0.h5
-else echo "default coco snapshot already downloaded"
-fi
+echo "downloading the default coco snapshot"
+wget -N https://github.com/fizyr/keras-maskrcnn/releases/download/0.2.2/resnet50_coco_v0.2.0.h5
 
 
-if [ ! -f "./resnet50_modanet.h5" ]
-then
-	echo "downloading the last available trained modanet snapshot"
-	wget -c https://github.com/cad0p/maskrcnn-modanet/releases/download/v0.9/resnet50_modanet.h5
-else echo "default modanet snapshot already downloaded"
-fi
+echo "downloading the last available trained modanet snapshot"
+wget -N https://github.com/cad0p/maskrcnn-modanet/releases/download/v1.0/resnet50_modanet.h5
 
 mkdir snapshots
 mkdir processedimages
