@@ -316,7 +316,28 @@ def getImageFromURL(url_pic, draw=False):
 
 
 
-def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_stats=True, choice=None, restore_result=False):
+def getImageFromFilePath(img_path, draw=False):
+    ''' The image is the one that will be processed, the draw is the one to be shown '''
+    import requests, cv2
+    from keras_retinanet.utils.image import read_image_bgr
+
+    image = read_image_bgr(img_path)
+
+    
+
+    if draw:
+        # copy to draw on
+        draw = image.copy()
+        
+        draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
+
+        return image, draw
+    else:
+        return image
+
+
+
+def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_stats=True, choice=None, restore_result=False):      
 	from maskrcnn_modanet.instagram_impl import InstaloaderURL
 	import matplotlib.pyplot as plt
 	import cv2
@@ -325,10 +346,13 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 
 	import json
 	import codecs
-
 	import os
 
 	import numpy as np
+
+	from maskrcnn_modanet.cli import validators
+
+
 
 	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
 		savedvars = json.load(f)
@@ -343,9 +367,10 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 
 	profile_path = path + 'results/instagram/'+ profile + '/'
 
+	save_path = profile_path + 'images/'
+
 	log_path = profile_path + timestr + '.txt'
 
-	
 
 	from instaloader import (InstaloaderException, InvalidArgumentException, Post, Profile, ProfileNotExistsException,
                StoryItem, __version__, load_structure_from_file, TwoFactorAuthRequiredException,
@@ -364,6 +389,19 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 		profile = instaloader.check_profile_id(target)
 
 		log_file = open(log_path, 'w+')
+
+		
+		if os.path.exists(save_path):
+			for the_file in os.listdir(save_path):
+			    file_path = os.path.join(save_path, the_file)
+			    try:
+			        if os.path.isfile(file_path):
+			            os.unlink(file_path)
+			        #elif os.path.isdir(file_path): shutil.rmtree(file_path)
+			    except Exception as e:
+			        print(e)
+
+		save_path = validators.check_if_folder_exists(None, None, save_path)
 
 		print(profile)
 
@@ -468,12 +506,20 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 				if choice == 'i':
 					img_anns = apply_mask(model, image, draw=draw, labels_to_names=labels_to_names, image_segments=False)
 					# show the image
-					plt.figure(figsize=(15, 15))
+					plt.figure(figsize=(15, 15), num=str(pic_index))
 					plt.axis('off')
 					plt.imshow(draw)
+
 					plt.show()
 				elif choice == 's':
 					img_anns = apply_mask(model, image, draw=draw, labels_to_names=labels_to_names, image_segments=True)
+
+					# save the images for easy retrieval
+					plt.figure(num=str(pic_index), dpi=400)
+					plt.axis('off')
+					plt.imshow(draw)
+					plt.savefig(save_path + str(pic_index) + '.png')
+
 					# let's count
 					labels_images[pic_index] = {}
 					for label_index in labels_to_names:
@@ -511,10 +557,24 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 		url_pics_person = results['url_pics_person']
 		labels_to_names = results['labels_to_names']
 
-		choice = 's'
+		print('We\'ve now recovered the images that are probably the ones with only the person who owns this account, processed to look for apparel and clothing items.')
+		if not choice:
+			choice = ''
+		while choice not in ['i', 's']:
+			choice = input('Do you want to see the images processed or to see some stats? Type \'i\' for image, \'s\' for stats: ')
 
 	if process_images and profile_stats:
-		if choice == 's':
+		if choice == 'i' and restore_result:
+			for pic_index, url_pic in url_pics_person:
+				image, draw = getImageFromFilePath(save_path + str(pic_index) + '.png', draw=True)
+				plt.figure(figsize=(9, 9), num=str(pic_index))
+				plt.axis('off')
+				plt.imshow(draw)
+				plt.show()
+
+
+
+		elif choice == 's':
 			print('I will now show you all the stats I can think of:')
 			print('I will now show you all the stats I can think of:', file=log_file)
 			print('Total images:', len(url_pics), 'Images with one person: ', len(url_pics_person))
@@ -553,7 +613,7 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 				if label == '':
 					label_again = False
 					break
-				segments = [img_ann['segment'] for pic_index in labels_images
+				segments = [(pic_index, img_ann['segment']) for pic_index in labels_images
 												for img_ann in labels_images[pic_index][label] ]
 
 				print('There are ', len(segments), ' results. Tell me the start and the end, as if you were slicing a Python array')
@@ -566,9 +626,14 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 
 				from PIL import Image
 
-				for segment in segments[from_i:to_i]:
+				for pic_index, segment in segments[from_i:to_i]:
 					img = Image.fromarray(segment, 'RGB')
-					img.show()
+					img.show(title=str(pic_index)+'.png')
+					
+					# plt.figure(figsize=(5, 5), num=str(pic_index), dpi=400)
+					# plt.axis('off')
+					# plt.imshow(segment)
+					# plt.show()
 
 
 

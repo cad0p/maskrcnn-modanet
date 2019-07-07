@@ -1,8 +1,6 @@
 import click, json, os
 
-from . import validators
-
-
+from maskrcnn_modanet.cli import validators
 
 def print_help(ctx, param, value):
     if value is False:
