@@ -239,7 +239,7 @@ def save():
 	pass
 
 @view.command()
-@click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
+@click.option('-p', '--proc-img-path', callback=validators.check_if_image_exists_in_dataset)
 @click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
@@ -258,7 +258,7 @@ def image(ctx, proc_img_path, proc_img_url, segments, all_set, model_path, thres
 		print_help(ctx, None,  value=True)
 
 @view.command()
-@click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
+@click.option('-p', '--proc-img-path', callback=validators.check_if_image_exists_in_dataset)
 @click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
 @click.option('-mt', '--model-type', default='default', callback=validators.check_if_model_type_valid, help='Set \'trained\' for your last trained snapshot on the snapshots folder, \'coco\' for the image recognition of the COCO dataset. \'default\' is the default value and is the pretrained modanet snapshot you downloaded in the results folder.')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
@@ -276,7 +276,7 @@ def annotations(ctx, proc_img_path, proc_img_url, model_path, threshold_score, m
 
 
 @save.command()
-@click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
+@click.option('-p', '--proc-img-path', callback=validators.check_if_image_exists_in_dataset)
 @click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
 @click.option('-s', '--segments', is_flag=True, default=False, help='For every annotation found in the image')
 @click.option('-a', '--all-set', is_flag=True, default=False, help='Results for each image in the validation set')
@@ -297,7 +297,7 @@ def image(ctx, proc_img_path, proc_img_url, save_path, segments, all_set, model_
 		print_help(ctx, None,  value=True)
 
 @save.command()
-@click.option('-p', '--proc-img-path', callback=validators.check_if_file_exists)
+@click.option('-p', '--proc-img-path', callback=validators.check_if_image_exists_in_dataset)
 @click.option('-u', '--proc-img-url', callback=validators.check_if_url_downloadable)
 @click.option('-mt', '--model-type', default='default', callback=validators.check_if_model_type_valid, help='Set \'trained\' for your last trained snapshot on the snapshots folder, \'coco\' for the image recognition of the COCO dataset. \'default\' is the default value and is the pretrained modanet snapshot you downloaded in the results folder.')
 @click.option('-m', '--model-path', default=None, callback=validators.check_if_file_exists, help='If you want to use a custom model other than the best one found in results')
