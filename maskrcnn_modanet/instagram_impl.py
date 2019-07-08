@@ -651,12 +651,17 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 												for img_ann in labels_images[pic_index][label] ]
 
 				print('There are ', len(segments), ' results. Tell me the start and the end, as if you were slicing a Python array')
+				print('You can also find the results in the folder:\n' + "/".join(segments[0].split("/")[:-1]))
 				from_i = input('Start: ')
 				if from_i == '':
 					from_i = None
+				else:
+					from_i = int(from_i)
 				to_i = input('End: ')
 				if to_i == '':
 					to_i = None
+				else:
+					to_i = int(to_i)
 
 				
 
