@@ -150,6 +150,12 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 	# use this environment flag to change which GPU to use
 	#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
+	with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
+		savedvars = json.load(f)
+	path = savedvars['datapath']
+
+	img_path = path + "datasets/coco/images/"
+
 	if not model:
 		# set the modified tf session as backend in keras
 		keras.backend.tensorflow_backend.set_session(get_session())
@@ -205,7 +211,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 
 	elif proc_img_path:
 		# just draw the image selected
-		images = [{'file_name': proc_img_path}]
+		images = [{'file_name': img_path + proc_img_path if os.path.abspath(proc_img_path) != proc_img_path else proc_img_path}]
 	elif proc_img_url:
 		# just draw the image selected
 		images = [{'file_name': proc_img_url}]
