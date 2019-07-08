@@ -7,3 +7,4 @@ include
 data/*
 share
 __pycache__
+dist
