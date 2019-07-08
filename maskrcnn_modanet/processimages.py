@@ -234,7 +234,7 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 				r = requests.get(img['file_name'], allow_redirects=True)
 				image = read_image_bgr(BytesIO(r.content))
 
-			if default_save_path:
+			if save_path:
 				if proc_img_path or all_set:
 					img_file_name = img['file_name'].split("/")[-1]
 

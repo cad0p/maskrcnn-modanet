@@ -70,7 +70,7 @@ def check_if_file_folder_exists(ctx, param, value):
 	if not os.path.exists(value_folder):
 		os.makedirs(value_folder)
 	
-	return value
+	return value + '/'
 
 def check_if_score_is_valid(ctx, param, value):
 	''' check_if_score_is_valid and if not raise error (score between 0 and 1) '''
