@@ -33,7 +33,6 @@ setuptools.setup(
       'pycocotools',
       'matplotlib',
       'tensorflow',
-      'tensorflow-gpu',
       'instaloader'
     ],
     entry_points = {
