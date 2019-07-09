@@ -6,7 +6,7 @@ with open("README.MD", "r") as fh:
 
 setuptools.setup(
     name='maskrcnn-modanet',  
-    version='1.0.1',
+    version='1.0.1.1',
     #scripts=['maskrcnn-modanet'] ,
     author="Pier Carlo Cadoppi",
     author_email="piercarlo.cadoppi@studenti.unipr.it",
