@@ -454,15 +454,21 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 					segments=False, annotations=False, threshold_score=0.5, limit=None, model=model, labels_to_names=labels_to_names)
 			elif process_images and profile_stats:
 				from maskrcnn_modanet.processimages import apply_mask
-				image, draw = getImageFromURL(url_pic, draw=True)
-
-				image_area = len(image) * len(image[0])
-
-				pic_index += 1
 
 				print(pic_index, end=' ')
 				print(pic_index, end=' ', file=log_file)
 				print(url_pic, file=log_file)
+
+				try:
+					image, draw = getImageFromURL(url_pic, draw=True)
+				except Exception:
+					print('Image ', pic_index, 'failed to download. Url tried below:\n' + url_pic + '\n\n Continuing to next image..')
+					print('Image ', pic_index, 'failed to download. Url tried below:\n' + url_pic + '\n\n Continuing to next image..', file=log_file)
+					continue
+
+				image_area = len(image) * len(image[0])
+
+				pic_index += 1
 
 				img_anns = apply_mask(model, image, draw=draw, labels_to_names=labels_to_names, image_segments=False)
 
