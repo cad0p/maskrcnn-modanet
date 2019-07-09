@@ -50,7 +50,9 @@ It then runs through the COCO model to determine the images that have only one p
 Say you want to quickly find what skirt (or footwear) your instagram star always wears. With this tool you can! And you can also see how often the instagram user shows himself alone in their images, and what he/she usually shares of him (always pictures with shoes? always only the top part?)
 
 
-[Link to the Thesis Presentation](https://drive.google.com/a/studenti.unipr.it/file/d/1IPyoPsAxFk7EXtFL3K4AbUWVy_VjKb6K/view?usp=drivesdk)
+[Link to the Thesis Presentation](https://docs.google.com/uc?id=1IPyoPsAxFk7EXtFL3K4AbUWVy_VjKb6K)
+
+[Short Version](https://docs.google.com/uc?id=1Tua2xs1DoY4Kv_bHwbF_rflgV8E7iTUq)
 
 ## Getting Started
 
