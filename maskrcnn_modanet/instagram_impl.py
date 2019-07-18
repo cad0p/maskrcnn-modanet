@@ -544,11 +544,14 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 					img_anns = apply_mask(model, image, draw=draw, labels_to_names=labels_to_names, image_segments=True)
 
 					# save the images for easy retrieval
-					plt.figure(num=str(pic_index), dpi=400)
-					plt.axis('off')
-					plt.imshow(draw)
-					plt.savefig(save_images_path + str(pic_index) + '.png')
-					plt.close()
+					# plt.figure(num=str(pic_index), dpi=400)
+					# plt.axis('off')
+					# plt.imshow(draw)
+					# plt.savefig(save_images_path + str(pic_index) + '.png')
+					# plt.close()
+					processed_image = Image.fromarray(draw, 'RGB')
+					processed_image.save(save_images_path + str(pic_index) + '.png')
+					del processed_image
 
 					# let's count
 					labels_images[pic_index] = {}
