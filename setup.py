@@ -6,7 +6,7 @@ with open("README.MD", "r") as fh:
 
 setuptools.setup(
 		name='maskrcnn-modanet',  
-		version='1.0.1.1',
+		version='1.0.2',
 		# scripts=[
 		# 	'maskrcnn_modanet/cli/main.py'
 		# ],

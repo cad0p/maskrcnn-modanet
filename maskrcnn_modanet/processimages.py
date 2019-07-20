@@ -326,17 +326,21 @@ def main(proc_img_path=None, proc_img_url=None, all_set=True, save_path=None, mo
 				segment_id += 1
 						
 			if not segments:    
-				plt.figure(figsize=(15, 15))
-				plt.axis('off')
-				plt.imshow(draw)
+				
 				if not save_path:
+					plt.figure(figsize=(15, 15))
+					plt.axis('off')
+					plt.imshow(draw)
 					if not proc_img_url:
 						print(img['file_name'])
 					plt.show()
 				elif save_path:
+					processed_image = Image.fromarray(draw, 'RGB')
+					processed_image.save(save_path)
+					del processed_image
 					print(save_path)
-					plt.savefig(save_path)
-					plt.close()
+					# plt.savefig(save_path)
+					# plt.close()
 			elif segments:
 				if annotations:
 					if save_path:
