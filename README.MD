@@ -61,11 +61,11 @@ Keep in mind to use pip or pip3 depending on your settings.
 
 Clone this repo
 
-Run `pip install maskrcnn-modanet --user`
+Run `pip install maskrcnn-modanet`
 
-Or go to the repo you just cloned on the terminal and run `pip install . -e --user`
+Or go to the repo you just cloned on the terminal and run `pip install -e .`
 
-If you see any errors, just install the dependencies manually, just like this: `pip3 install --upgrade cython --user`
+If you see any errors, just install the dependencies manually, just like this: `pip3 install --upgrade cython`
 
 Now that you've installed it, run `maskrcnn-modanet datasets download the/folder/you/want/to/put/data/in`
 

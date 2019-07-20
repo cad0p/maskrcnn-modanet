@@ -658,26 +658,28 @@ def instagramImpl(profile, limit=None, offset=0, process_images=True, profile_st
 					break
 				segments = [img_ann['segment'] for pic_index in labels_images
 												for img_ann in labels_images[pic_index][label] ]
+				if len(segments) > 0:
+					print('There are ', len(segments), ' results. Tell me the start and the end, as if you were slicing a Python array')
+					print('You can also find the results in the folder:\n' + "/".join(segments[0].split("/")[:-1]))
+					from_i = input('Start: ')
+					if from_i == '':
+						from_i = None
+					else:
+						from_i = int(from_i)
+					to_i = input('End: ')
+					if to_i == '':
+						to_i = None
+					else:
+						to_i = int(to_i)
 
-				print('There are ', len(segments), ' results. Tell me the start and the end, as if you were slicing a Python array')
-				print('You can also find the results in the folder:\n' + "/".join(segments[0].split("/")[:-1]))
-				from_i = input('Start: ')
-				if from_i == '':
-					from_i = None
+					
+
+					for segment_path in segments[from_i:to_i]:
+						img = Image.open(segment_path)
+						img.show(title=segment_path.split('/')[-1])
+						del img
 				else:
-					from_i = int(from_i)
-				to_i = input('End: ')
-				if to_i == '':
-					to_i = None
-				else:
-					to_i = int(to_i)
-
-				
-
-				for segment_path in segments[from_i:to_i]:
-					img = Image.open(segment_path)
-					img.show(title=segment_path.split('/')[-1])
-					del img
+					print('There are no segments to show for this label.\n')
 					
 					# plt.figure(figsize=(5, 5), num=str(pic_index), dpi=400)
 					# plt.axis('off')
