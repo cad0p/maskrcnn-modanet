@@ -156,9 +156,9 @@ def download(path):
 			https://github.com/kyamagu/paperdoll/tree/master/data/chictopia
 			''')
 
-	failure = os.system("sh " + dir_pkg_path + "download.sh '" + path + "' " + str(fast_download) )
+	failure = os.system("bash " + dir_pkg_path + "download.sh '" + path + "' " + str(fast_download) )
 
-	if failure:
+	if failure == 1:
 		print('Bash script failed. Run again this command after having downloaded the necessary packages')
 		exit()
 

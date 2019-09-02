@@ -77,6 +77,16 @@ echo $text
 # download images annotations
 git clone https://github.com/eBay/modanet.git
 
+cd modanet
+cd annotations
+
+wget -O modanet2018_instances_train.json https://github.com/cad0p/maskrcnn-modanet/releases/download/v1.0.3/modanet2018_instances_train.json
+
+wget -O modanet2018_instances_val.json https://github.com/cad0p/maskrcnn-modanet/releases/download/v1.0.3/modanet2018_instances_val.json
+
+cd ..
+cd ..
+
 
 mkdir coco #this will be our dataset final folder
 cd coco

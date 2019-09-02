@@ -6,9 +6,9 @@ with open("README.MD", "r") as fh:
 
 setuptools.setup(
 		name='maskrcnn-modanet',  
-		version='1.0.2.1',
+		version='1.0.3',
 		# scripts=[
-		# 	'maskrcnn_modanet/cli/main.py'
+		# 	'maskrcnn_modanet/download.sh'
 		# ],
 		author="Pier Carlo Cadoppi",
 		author_email="piercarlo.cadoppi@studenti.unipr.it",
@@ -42,6 +42,8 @@ setuptools.setup(
 		    'console_scripts': [
 		        'maskrcnn-modanet=maskrcnn_modanet.cli.main:main',
 		    ],
-		}
+		},
+		include_package_data=True,
+		zip_safe=False
 
  )
