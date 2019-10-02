@@ -59,6 +59,11 @@ Say you want to quickly find what skirt (or footwear) your instagram star always
 This project is written in Python 3, so it works in all major OSes. Although only Linux and MacOS are fully supported.
 Keep in mind to use pip or pip3 depending on your settings.
 
+> UPDATE: My suggestion is to run it using Google Colab. 
+Just make a copy of [this notebook](https://colab.research.google.com/drive/11ytb0srMyOGXQtHoF0ocCkKGNTb7fvmq) and click play on the code snippets.
+
+> The code has been optimized to run well on Colab
+
 Clone this repo
 
 Run `pip install maskrcnn-modanet`
