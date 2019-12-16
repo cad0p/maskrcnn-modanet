@@ -1,5 +1,6 @@
 import json
 import os
+from PIL import Image
 
 with open(os.path.expanduser('~')+ '/.maskrcnn-modanet/' + 'savedvars.json') as f:
 	savedvars = json.load(f)
