@@ -35,7 +35,10 @@ setuptools.setup(
 			'numpy',
 			'pycocotools',
 			'matplotlib',
-			'tensorflow',
+			'tensorflow==1.13.1',
+			'keras==2.2.5',
+			'keras-retinanet==0.5.1',
+			'h5py<3.0.0',
 			'instaloader'
 		],
 		entry_points = {
