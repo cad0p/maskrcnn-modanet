@@ -35,7 +35,7 @@ setuptools.setup(
 			'numpy',
 			'pycocotools',
 			'matplotlib',
-			'tensorflow==1.13.1',
+			'tensorflow==2.5.3',
 			'keras==2.2.5',
 			'keras-retinanet==0.5.1',
 			'h5py<3.0.0',
